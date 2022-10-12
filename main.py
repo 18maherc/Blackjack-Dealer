@@ -1,5 +1,6 @@
-from http.client import TOO_MANY_REQUESTS
+from cmath import e
 import random
+from tkinter import E
 
 # Let's give the info of the card's suits, ranks and values
 suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
@@ -38,6 +39,10 @@ class Hand():
                     self.score -= 10
                     c.points = 1
                     break
+            self.done_flag = True  # No aces to reduce so flag their bust as done
+        elif self.score == 21:
+            self.done_flag = True  # auto-stand when player hits 21
+
         #Player1Hand = Hand()
         #Player1Hand.add_Card(Card('Ace', 'Heart'))
 
@@ -58,7 +63,7 @@ class Player():
     def delete_hand(self, hand):
         self.hands.remove(hand)
 
-    def split_hand(self):  # TODO: change these checks to try-catches
+    def split_hand(self):
         if len(self.hands) == 1:
             if len(self.hands[0].cards) == 2:
                 first_card = self.hands[0].cards[0]
@@ -71,6 +76,13 @@ class Player():
                     new_hand2 = Hand()
                     new_hand2.add_card(second_card)
                     self.add_hand(new_hand2)
+                else:
+                    raise Exception(
+                        "Can only split when 2 cards are even in points")
+            else:
+                raise Exception("Can only split when you have 2 cards")
+        else:
+            raise Exception("Can only split when you have a single hand")
 
 
 class Dealer():
@@ -99,7 +111,7 @@ class Deck:
             deck_comp += '\n '+card.__str__()  # add each Card object's print string
         return 'The deck has:' + deck_comp
 
-    def shuffle(self):          # shuffle function will shuffle the initial deck
+    def shuffle(self):          # shuffle function will shuffle 52 card deck
         random.shuffle(self.deck)
 
     def deal(self):             # deal function will take one card from the deck
@@ -117,6 +129,8 @@ def action(deck, hand):
             hit(deck, hand)
         elif x[0].lower() == 's':
             stand(hand)
+        elif x[0].lower() == 'p':
+            split(hand)
         else:
             print("Sorry, please try again.")
             continue
@@ -132,7 +146,10 @@ def stand(hand):
 
 
 def split(player):
-    player.split_hand()
+    try:
+        player.split_hand()
+    except Exception as e:
+        print(e)
 
 
 def double(deck, hand):
@@ -179,6 +196,33 @@ def push():
     print("Dealer and Player tie! It's a push.")
 
 
+def calculate_winner(dealer_hand, player_hand):
+    if player_hand.score <= 21:
+
+        # If Player hasn't busted, play Dealer's hand until Dealer reaches 17
+        while dealer_hand.score < 17:
+            hit(deck, dealer_hand)
+
+        # Show all cards
+        show_dealer(dealer_hand)
+
+        # Run different winning scenarios
+        if dealer_hand.score > 21:
+            dealer_busts()
+
+        elif dealer_hand.score > player_hand.score:
+            dealer_wins()
+
+        elif dealer_hand.score < player_hand.score:
+            player_wins()
+
+        else:
+            push()
+    else:
+        # If player's hand exceeds 21, run player_busts() and break out of loop
+        player_busts()
+
+
 # Game:
 while True:
     # Print an opening statement
@@ -215,33 +259,7 @@ while True:
         # Show resulting hand
         show_player(player_hand)
 
-        # If player's hand exceeds 21, run player_busts() and break out of loop
-        if player_hand.score > 21:
-            player_busts()
-            player_hand.done_flag = TOO_MANY_REQUESTS
-            break
-
-    if player_hand.score <= 21:
-
-        # If Player hasn't busted, play Dealer's hand until Dealer reaches 17
-        while dealer_hand.score < 17:
-            hit(deck, dealer_hand)
-
-        # Show all cards
-        show_dealer(dealer_hand)
-
-        # Run different winning scenarios
-        if dealer_hand.score > 21:
-            dealer_busts()
-
-        elif dealer_hand.score > player_hand.score:
-            dealer_wins()
-
-        elif dealer_hand.score < player_hand.score:
-            player_wins()
-
-        else:
-            push()
+    calculate_winner(dealer_hand, player_hand)
 
     # Ask to play again
     new_game = input("Would you like to play another hand? Enter 'y' or 'n' ")
@@ -249,6 +267,74 @@ while True:
     if new_game[0].lower() == 'y':
         playing = True
         continue
+    elif new_game[0].lower() == 't':
+
+        testdeck = Deck()
+
+        blackjack = Hand()
+        blackjack.add_card(Card('Hearts', 'Ace'))
+        blackjack.add_card(Card('Hearts', 'King'))
+
+        fourteen = Hand()
+        fourteen.add_card(Card('Hearts', 'Eight'))
+        fourteen.add_card(Card('Hearts', 'Six'))
+
+        nineteen = Hand()
+        nineteen.add_card(Card('Hearts', 'Nine'))
+        nineteen.add_card(Card('Hearts', 'Ten'))
+
+        doubleace = Hand()
+        doubleace.add_card(Card('Hearts', 'Ace'))
+        doubleace.add_card(Card('Hearts', 'Ace'))
+
+        print("Test Cases:")
+        # Player gets blackjack
+        testDealer = Dealer(nineteen)
+        dealerhand = testDealer.hand
+        testplayer = Player()
+        testplayer.add_hand(blackjack)
+        playerhand = testplayer.hands[0]
+        show_player(playerhand)
+        calculate_winner(dealerhand, playerhand)
+
+        # Player and dealer both have blackjack
+        testDealer = Dealer(blackjack)
+        dealerhand = testDealer.hand
+        testplayer = Player()
+        testplayer.add_hand(blackjack)
+        playerhand = testplayer.hands[0]
+        show_player(playerhand)
+        calculate_winner(dealerhand, playerhand)
+
+        # Player busts - Dealer auto wins
+        testDealer = Dealer(nineteen)
+        dealerhand = testDealer.hand
+        testplayer = Player()
+        testplayer.add_hand(fourteen)
+        playerhand = testplayer.hands[0]
+        playerhand.add_card(Card('Hearts', 'Nine'))
+        show_player(playerhand)
+        calculate_winner(dealerhand, playerhand)
+
+        # Player stands, Dealer wins
+        testDealer = Dealer(nineteen)
+        dealerhand = testDealer.hand
+        testplayer = Player()
+        testplayer.add_hand(fourteen)
+        playerhand = testplayer.hands[0]
+        show_player(playerhand)
+        calculate_winner(dealerhand, playerhand)
+
+        # Player stands, Dealer busts
+        testDealer = Dealer(nineteen)
+        dealerhand = testDealer.hand
+        testplayer = Player()
+        testplayer.add_hand(nineteen)
+        playerhand = testplayer.hands[0]
+        dealerhand.add_card(Card('Hearts', 'Nine'))
+        show_player(playerhand)
+        calculate_winner(dealerhand, playerhand)
+
     else:
         print("Thanks for playing!")
         break
