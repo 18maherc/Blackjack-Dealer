@@ -1,4 +1,5 @@
 import random
+import math
 
 # Let's give the info of the card's suits, ranks and values
 suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
@@ -41,9 +42,6 @@ class Hand():
         elif self.score == 21:
             self.done_flag = True  # auto-stand when player hits 21
 
-        #Player1Hand = Hand()
-        #Player1Hand.add_Card(Card('Ace', 'Heart'))
-
     def contains(self, card: Card) -> bool:
         for c in self.cards:
             if card.value == c.value:
@@ -54,6 +52,8 @@ class Hand():
 class Player():
     def __init__(self, starting_hand: Hand):
         self.hands = [starting_hand]
+        self.wallet = 0
+        self.betamt = 0
 
     def add_hand(self, hand: Hand):
         self.hands.append(hand)
@@ -89,6 +89,21 @@ class Player():
                 raise Exception("Can only split when you have 2 cards")
         else:
             raise Exception("Can only split when you have a single hand")
+
+    def add_credits(self, credits: int):
+        self.wallet += math.ceil(credits)
+
+    def remove_credits(self, credits: int):
+        self.wallet -= credits
+
+    def set_bet_amt(self, amount: int):
+        if amount > 0:
+            if amount <= self.wallet:
+                self.betamt = amount
+            else:
+                raise Exception("Cannot bet more than your current wallet")
+        else:
+            raise Exception("Must bet a minimum of 1 credits to play")
 
 
 class Dealer():
@@ -127,8 +142,10 @@ class Deck:
 
 class Table():
     def __init__(self, player_count: int):
-        # Initialize our collection of players with a Dealer
-        self.players = [Dealer(Hand())]
+        # Initialize our collection of players
+        self.players = []
+        # Initialize our Dealer
+        self.dealer = Dealer(Hand())
 
         # Add x number of players to the game
         for i in range(player_count):
@@ -139,3 +156,10 @@ class Table():
         self.deck.shuffle()
         self.deck.add_deck()
         self.deck.add_deck()
+
+    def add_player(self, player: Player, deposit: int):
+        player.wallet = deposit
+        self.players.append(player)
+
+    def remove_player(self, player: Player):
+        self.players.remove(player)
