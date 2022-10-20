@@ -1,22 +1,26 @@
 from game_objects import *
 
 
-# Game Functions:
+# ---- Game Functions: ----
 # function prompting the Player to Hit or Stand
 def action(deck: Deck, hand: Hand, player=None):
     while True:
-        x = input("Would you like to Hit or Stand? Enter 'h' or 's' ")
+        x = input("Hit(h) Stand(s) Split(p) Double(d)? ")
 
-        if x[0].lower() == 'h':
-            hit(deck, hand)
-        elif x[0].lower() == 's':
-            stand(hand)
-        elif x[0].lower() == 'p' and player is not None:
-            split(player)
-        else:
-            print("Sorry, please try again.")
-            continue
-        break
+        try:
+            if x[0].lower() == 'h':
+                hit(deck, hand)
+            elif x[0].lower() == 's':
+                stand(hand)
+            elif x[0].lower() == 'p' and player is not None:
+                split(player)
+            elif x[0].lower() == 'd':
+                double(deck, hand, player)
+            else:
+                raise Exception("Invalid action. Please try again")
+            break
+        except Exception as e:
+            print(e)
 
 
 def hit(deck: Deck, hand: Hand):
@@ -28,18 +32,23 @@ def stand(hand: Hand):
 
 
 def split(player: Player):
-    try:
-        player.split_hand()
-    except Exception as e:
-        print(e)
+    player.split_hand()
 
 
-def double(deck: Deck, hand: Hand):
-    hit(deck, hand)
-    hand.done_flag = True
+def double(deck: Deck, hand: Hand, player: Player):
+    if len(hand.cards):
+        if player.wallet >= hand.wager:
+            player.remove_credits(hand.wager)
+            hit(deck, hand)
+            hand.wager *= 2
+            hand.done_flag = True
+        else:
+            raise Exception("Do not have enough credits to double down")
+    else:
+        raise Exception("Can only double down with a 2 card hand")
 
 
-# functions to display cards
+# --- functions to display cards ---
 def show_dealer(dealer_hand: Hand):
     print(f"\nDealer's Hand: {dealer_hand.score}")
     for card in dealer_hand.cards:
@@ -63,109 +72,185 @@ def show_player(player_num: int, player_hand: Hand):
         print(f"{card.to_string()}, ")
 
 
-# functions to handle end of game scenarios
-def player_busts():
+# --- functions to handle end of game scenarios ---
+def player_busts(player: Player):
     print("Player busts!")
+    player.add_credits(0)
 
 
-def player_wins():
+def player_wins(player: Player, hand: Hand):
     print("Player wins!")
+    player.add_credits(2*hand.wager)
 
 
-def dealer_busts():
+def player_blackjack(player: Player, hand: Hand):
+    print("Player won with blackjack!")
+    player.add_credits(2.5*hand.wager)
+
+
+def dealer_busts(player: Player, hand: Hand):
     print("Dealer busts!")
+    player.add_credits(2*hand.wager)
 
 
-def dealer_wins():
+def dealer_wins(player: Player):
     print("Dealer wins!")
+    player.add_credits(0)
 
 
-def push():
+def push(player: Player, hand: Hand):
     print("Dealer and Player tie! It's a push.")
+    player.add_credits(hand.wager)
 
 
-def calculate_winner(dealer_hand, player_hand):
-    # Show Dealer's cards
-    show_dealer(dealer_hand)
-    if player_hand.score <= 21:
-        # Run different winning scenarios
-        if dealer_hand.score > 21:
-            dealer_busts()
-
-        elif dealer_hand.score > player_hand.score:
-            dealer_wins()
-
-        elif dealer_hand.score < player_hand.score:
-            player_wins()
-
+def calculate_winner(dealer_hand: Hand, player_hand: Hand, player: Player):
+    # Player hit 21
+    if player_hand.score == 21:
+        if player_hand.size == 2:
+            if dealer_hand.score == 21:
+                if dealer_hand.size == 2:
+                    push(player, player_hand)
+                else:
+                    player_blackjack(player, player_hand)
+            else:
+                player_blackjack(player, player_hand)
         else:
-            push()
+            if dealer_hand.score == 21:
+                if dealer_hand.size == 2:
+                    # TODO: normally should compensate here for dealer 2 card 21, but that's what insurance should cover
+                    dealer_wins(player)
+                else:
+                    push(player, player_hand)
+            else:
+                player_wins(player, player_hand)
+    # Player stayed under 21
+    elif player_hand.score < 21:
+        # Dealer goes over and Player is under
+        if dealer_hand.score > 21:
+            dealer_busts(player, player_hand)
+        # Dealer and Player are both under but dealer is higher
+        elif dealer_hand.score > player_hand.score:
+            dealer_wins(player)
+        # Dealer and Player are both under but player is higher
+        elif dealer_hand.score < player_hand.score:
+            player_wins(player, player_hand)
+        # Dealer and Player are tied
+        else:
+            push(player, player_hand)
+    # Player busted. A loss no matter Dealer's cards
     else:
-        # If player's hand exceeds 21, run player_busts() and break out of loop
-        player_busts()
+        player_busts(player)
 
 
-# Game:
+# ---- Game: ----
 while True:
     # Print an opening statement
-    print('Play a game of Blackjack!!')
+    print("Play a game of Blackjack!!")
 
     while True:
         try:
-            num_of_players = int(input('How many players?? '))
+            num_of_players = int(input("How many players?? "))
             break
         except ValueError:
-            print("you must enter an integer")
+            print("You must enter an integer")
             continue
 
     the_table = Table(num_of_players)
 
-    the_dealer = the_table.players[0]
-    the_players = the_table.players[1:]
+    the_dealer = the_table.dealer
+    the_players = the_table.players
 
     dealer_hand = the_dealer.hand
 
-    # Deal first card to every player and the dealer
-    for playernum in range(len(the_players)):
-        the_players[playernum].hands[0].add_card(the_table.deck.deal())
-    the_dealer.hand.add_card(the_table.deck.deal())
-    # Deal second card to every player and the dealer
-    for playernum in range(len(the_players)):
-        the_players[playernum].hands[0].add_card(the_table.deck.deal())
-    the_dealer.hand.add_card(the_table.deck.deal())
+    while True:
+        # Take bets for all players (will allow you to bet 0 for now)
+        for playernum in range(len(the_players)):
+            player = the_players[playernum]
+            while True:
+                try:
+                    if player.wallet < 1:
+                        while True:
+                            try:
+                                deposit = int(
+                                    input(f"Player {playernum+1}, input a number of credits to deposit: "))
+                                player.add_credits(deposit)
+                                break
+                            except ValueError:
+                                print("You must enter an integer")
+                                continue
+                    bet_amount = int(input(
+                        f"Player {playernum+1}, you have {player.wallet} credits, enter your wager: "))
+                    if bet_amount > 0:
+                        if bet_amount <= player.wallet:
+                            player.hands[0].wager = bet_amount
+                            player.remove_credits(bet_amount)
+                        else:
+                            raise Exception(
+                                "Cannot bet more than your current wallet")
+                    else:
+                        raise Exception(
+                            "Must bet a minimum of 1 credits to play")
+                    break
+                except Exception as e:
+                    print(e)
+                    continue
 
-    # Show cards (but keep one dealer card hidden)
-    for playernum in range(len(the_players)):
-        player = the_players[playernum]
-        for handnum in range(len(player.hands)):
-            show_player(playernum, player.hands[handnum])
-    show_dealer_hidden(dealer_hand)
+        # Deal first card to every player and the dealer. Also set the wager
+        for playernum in range(len(the_players)):
+            the_players[playernum].hands[0].add_card(the_table.deck.deal())
+        the_dealer.hand.add_card(the_table.deck.deal())
+        # Deal second card to every player and the dealer
+        for playernum in range(len(the_players)):
+            the_players[playernum].hands[0].add_card(the_table.deck.deal())
+        the_dealer.hand.add_card(the_table.deck.deal())
 
-    for playernum in range(len(the_players)):
-        player = the_players[playernum]
-        for handnum in range(len(player.hands)):
-            hand = player.hands[handnum]
-            while hand.done_flag is not True:
-                # Prompt for Player to Hit or Stand
-                action(the_table.deck, hand)
-                # Show resulting hand
+        show_dealer_hidden(dealer_hand)
+
+        for playernum in range(len(the_players)):
+            player = the_players[playernum]
+            for handnum in range(len(player.hands)):
+                hand = player.hands[handnum]
+                while hand.done_flag is not True:
+                    # Show current hand
+                    show_player(playernum, hand)
+                    # Prompt for Player to Hit or Stand
+                    action(the_table.deck, hand, player)
+                # Show the final state of the hand
                 show_player(playernum, hand)
 
-    # Have Dealer play out its hand until reaching soft or hard 17
-    while dealer_hand.score < 17:
-        hit(the_table.deck, dealer_hand)
+        # Have Dealer play out its hand until reaching soft or hard 17
+        while dealer_hand.score < 17:
+            hit(the_table.deck, dealer_hand)
 
-    for playernum in range(len(the_players)):
-        for handnum in range(len(the_players[playernum].hands)):
-            calculate_winner(
-                dealer_hand, the_players[playernum].hands[handnum])
+        # Show Dealer's cards
+        show_dealer(dealer_hand)
 
-    # Ask to play again
-    new_game = input("Would you like to play another hand? Enter 'y' or 'n' ")
+        # Show cards (but keep one dealer card hidden)
+        # for playernum in range(len(the_players)):
+        #    player = the_players[playernum]
+        #    for handnum in range(len(player.hands)):
+        #        show_player(playernum, player.hands[handnum])
 
-    if new_game[0].lower() == 'y':
-        playing = True
-        continue
-    else:
-        print("Thanks for playing!")
+        for playernum in range(len(the_players)):
+            player = the_players[playernum]
+            for handnum in range(len(player.hands)):
+                calculate_winner(dealer_hand, player.hands[handnum], player)
+                print(
+                    f"Player {playernum+1} you now have {player.wallet} credits.")
+
+        # Ask to play again
+        new_game = input(
+            "Would you like to play another game? Enter 'y' or 'n' ")
+
+        if new_game[0].lower() == 'y':
+            the_dealer.hand = Hand()
+            for playernum in range(len(the_players)):
+                the_players[playernum].clear()
+            continue
+        else:
+            print("Thanks for playing!")
+            break
+
+    close_game = input("Would you like to close the game? (y/n) ")
+    if close_game[0].lower() == 'y':
         break
