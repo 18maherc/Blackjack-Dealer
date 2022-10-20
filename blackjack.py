@@ -15,10 +15,12 @@ def action(deck: Deck, hand: Hand, player=None):
             elif x[0].lower() == 'p' and player is not None:
                 split(player)
             elif x[0].lower() == 'd':
-                double(deck, hand)
+                double(deck, hand, player)
+            else:
+                raise Exception("Invalid action. Please try again")
             break
-        except Exception:
-            print("Invalid action. Please try again")
+        except Exception as e:
+            print(e)
 
 
 def hit(deck: Deck, hand: Hand):
@@ -30,22 +32,20 @@ def stand(hand: Hand):
 
 
 def split(player: Player):
-    try:
-        player.split_hand()
-    except Exception as e:
-        print(e)
+    player.split_hand()
 
 
-def double(deck: Deck, hand: Hand):
-    try:
-        if len(hand.cards):
+def double(deck: Deck, hand: Hand, player: Player):
+    if len(hand.cards):
+        if player.wallet >= hand.wager:
+            player.remove_credits(hand.wager)
             hit(deck, hand)
             hand.wager *= 2
             hand.done_flag = True
         else:
-            raise Exception("Can only double down with a 2 card hand")
-    except Exception as e:
-        print(e)
+            raise Exception("Do not have enough credits to double down")
+    else:
+        raise Exception("Can only double down with a 2 card hand")
 
 
 # --- functions to display cards ---
@@ -78,19 +78,19 @@ def player_busts(player: Player):
     player.add_credits(0)
 
 
-def player_wins(player: Player):
+def player_wins(player: Player, hand: Hand):
     print("Player wins!")
-    player.add_credits(2*player.betamt)
+    player.add_credits(2*hand.wager)
 
 
-def player_blackjack(player: Player):
+def player_blackjack(player: Player, hand: Hand):
     print("Player won with blackjack!")
-    player.add_credits(2.5*player.betamt)
+    player.add_credits(2.5*hand.wager)
 
 
-def dealer_busts(player: Player):
+def dealer_busts(player: Player, hand: Hand):
     print("Dealer busts!")
-    player.add_credits(2*player.betamt)
+    player.add_credits(2*hand.wager)
 
 
 def dealer_wins(player: Player):
@@ -98,40 +98,45 @@ def dealer_wins(player: Player):
     player.add_credits(0)
 
 
-def push(player: Player):
+def push(player: Player, hand: Hand):
     print("Dealer and Player tie! It's a push.")
-    player.add_credits(player.betamt)
+    player.add_credits(hand.wager)
 
 
 def calculate_winner(dealer_hand: Hand, player_hand: Hand, player: Player):
     # Player hit 21
     if player_hand.score == 21:
-        # Dealer wins with less cards
-        if player_hand.size > dealer_hand.size:
-            dealer_wins(player)
-        # Player wins with less cards
-        elif player_hand.size < dealer_hand.size:
-            if player_hand.size == 2:
-                player_blackjack(player)
+        if player_hand.size == 2:
+            if dealer_hand.score == 21:
+                if dealer_hand.size == 2:
+                    push(player, player_hand)
+                else:
+                    player_blackjack(player, player_hand)
             else:
-                player_wins(player)
-        # Player and Dealer tie with equal cards
+                player_blackjack(player, player_hand)
         else:
-            push(player)
+            if dealer_hand.score == 21:
+                if dealer_hand.size == 2:
+                    # TODO: normally should compensate here for dealer 2 card 21, but that's what insurance should cover
+                    dealer_wins(player)
+                else:
+                    push(player, player_hand)
+            else:
+                player_wins(player, player_hand)
     # Player stayed under 21
     elif player_hand.score < 21:
         # Dealer goes over and Player is under
         if dealer_hand.score > 21:
-            dealer_busts(player)
+            dealer_busts(player, player_hand)
         # Dealer and Player are both under but dealer is higher
         elif dealer_hand.score > player_hand.score:
             dealer_wins(player)
         # Dealer and Player are both under but player is higher
         elif dealer_hand.score < player_hand.score:
-            player_wins(player)
+            player_wins(player, player_hand)
         # Dealer and Player are tied
         else:
-            push(player)
+            push(player, player_hand)
     # Player busted. A loss no matter Dealer's cards
     else:
         player_busts(player)
@@ -157,73 +162,95 @@ while True:
 
     dealer_hand = the_dealer.hand
 
-    # Take bets for all players (will allow you to bet 0 for now)
-    for playernum in range(len(the_players)):
-        player = the_players[playernum]
-        while True:
-            try:
-                bet_amount = int(
-                    input(f"Player {playernum+1}, you have {player.wallet} credits, enter your wager: "))
-                player.set_bet_amt(bet_amount)
-                break
-            except Exception as e:
-                print(e)
-                continue
+    while True:
+        # Take bets for all players (will allow you to bet 0 for now)
+        for playernum in range(len(the_players)):
+            player = the_players[playernum]
+            while True:
+                try:
+                    if player.wallet < 1:
+                        while True:
+                            try:
+                                deposit = int(
+                                    input(f"Player {playernum+1}, input a number of credits to deposit: "))
+                                player.add_credits(deposit)
+                                break
+                            except ValueError:
+                                print("You must enter an integer")
+                                continue
+                    bet_amount = int(input(
+                        f"Player {playernum+1}, you have {player.wallet} credits, enter your wager: "))
+                    if bet_amount > 0:
+                        if bet_amount <= player.wallet:
+                            player.hands[0].wager = bet_amount
+                            player.remove_credits(bet_amount)
+                        else:
+                            raise Exception(
+                                "Cannot bet more than your current wallet")
+                    else:
+                        raise Exception(
+                            "Must bet a minimum of 1 credits to play")
+                    break
+                except Exception as e:
+                    print(e)
+                    continue
 
-    # Set wagers for each players' initial hand
-    for playernum in range(len(the_players)):
-        player = the_players[playernum]
-        player.hands[0].wager = player.betamt
-        player.remove_credits(player.betamt)
-    # Deal first card to every player and the dealer. Also set the wager
-    for playernum in range(len(the_players)):
-        the_players[playernum].hands[0].add_card(the_table.deck.deal())
-    the_dealer.hand.add_card(the_table.deck.deal())
-    # Deal second card to every player and the dealer
-    for playernum in range(len(the_players)):
-        the_players[playernum].hands[0].add_card(the_table.deck.deal())
-    the_dealer.hand.add_card(the_table.deck.deal())
+        # Deal first card to every player and the dealer. Also set the wager
+        for playernum in range(len(the_players)):
+            the_players[playernum].hands[0].add_card(the_table.deck.deal())
+        the_dealer.hand.add_card(the_table.deck.deal())
+        # Deal second card to every player and the dealer
+        for playernum in range(len(the_players)):
+            the_players[playernum].hands[0].add_card(the_table.deck.deal())
+        the_dealer.hand.add_card(the_table.deck.deal())
 
-    show_dealer_hidden(dealer_hand)
+        show_dealer_hidden(dealer_hand)
 
-    for playernum in range(len(the_players)):
-        player = the_players[playernum]
-        for handnum in range(len(player.hands)):
-            hand = player.hands[handnum]
-            while hand.done_flag is not True:
-                # Show current hand
+        for playernum in range(len(the_players)):
+            player = the_players[playernum]
+            for handnum in range(len(player.hands)):
+                hand = player.hands[handnum]
+                while hand.done_flag is not True:
+                    # Show current hand
+                    show_player(playernum, hand)
+                    # Prompt for Player to Hit or Stand
+                    action(the_table.deck, hand, player)
+                # Show the final state of the hand
                 show_player(playernum, hand)
-                # Prompt for Player to Hit or Stand
-                action(the_table.deck, hand, player)
-            # Show the final state of the hand
-            show_player(playernum, hand)
 
-    # Have Dealer play out its hand until reaching soft or hard 17
-    while dealer_hand.score < 17:
-        hit(the_table.deck, dealer_hand)
+        # Have Dealer play out its hand until reaching soft or hard 17
+        while dealer_hand.score < 17:
+            hit(the_table.deck, dealer_hand)
 
-    # Show Dealer's cards
-    show_dealer(dealer_hand)
+        # Show Dealer's cards
+        show_dealer(dealer_hand)
 
-    # Show cards (but keep one dealer card hidden)
-    # for playernum in range(len(the_players)):
-    #    player = the_players[playernum]
-    #    for handnum in range(len(player.hands)):
-    #        show_player(playernum, player.hands[handnum])
+        # Show cards (but keep one dealer card hidden)
+        # for playernum in range(len(the_players)):
+        #    player = the_players[playernum]
+        #    for handnum in range(len(player.hands)):
+        #        show_player(playernum, player.hands[handnum])
 
-    for playernum in range(len(the_players)):
-        player = the_players[playernum]
-        for handnum in range(len(player.hands)):
-            calculate_winner(dealer_hand, player.hands[handnum], player)
-            print(
-                f"Player {playernum+1} you now have {player.wallet} credits.")
+        for playernum in range(len(the_players)):
+            player = the_players[playernum]
+            for handnum in range(len(player.hands)):
+                calculate_winner(dealer_hand, player.hands[handnum], player)
+                print(
+                    f"Player {playernum+1} you now have {player.wallet} credits.")
 
-    # Ask to play again
-    new_game = input("Would you like to play another game? Enter 'y' or 'n' ")
+        # Ask to play again
+        new_game = input(
+            "Would you like to play another game? Enter 'y' or 'n' ")
 
-    if new_game[0].lower() == 'y':
-        playing = True
-        continue
-    else:
-        print("Thanks for playing!")
+        if new_game[0].lower() == 'y':
+            the_dealer.hand = Hand()
+            for playernum in range(len(the_players)):
+                the_players[playernum].clear()
+            continue
+        else:
+            print("Thanks for playing!")
+            break
+
+    close_game = input("Would you like to close the game? (y/n) ")
+    if close_game[0].lower() == 'y':
         break

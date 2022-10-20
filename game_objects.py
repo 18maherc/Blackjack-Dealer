@@ -53,7 +53,6 @@ class Player():
     def __init__(self, starting_hand: Hand):
         self.hands = [starting_hand]
         self.wallet = 0
-        self.betamt = 0
 
     def add_hand(self, hand: Hand):
         self.hands.append(hand)
@@ -84,9 +83,9 @@ class Player():
                     self.add_hand(new_hand2)
                 else:
                     raise Exception(
-                        "Can only split when 2 cards are even in points")
+                        "Can only split when two cards are equal in points")
             else:
-                raise Exception("Can only split when you have 2 cards")
+                raise Exception("Can only split when you have two cards")
         else:
             raise Exception("Can only split when you have a single hand")
 
@@ -96,14 +95,9 @@ class Player():
     def remove_credits(self, credits: int):
         self.wallet -= credits
 
-    def set_bet_amt(self, amount: int):
-        if amount > 0:
-            if amount <= self.wallet:
-                self.betamt = amount
-            else:
-                raise Exception("Cannot bet more than your current wallet")
-        else:
-            raise Exception("Must bet a minimum of 1 credits to play")
+    def clear(self):
+        self.hands.clear()
+        self.add_hand(Hand())
 
 
 class Dealer():
