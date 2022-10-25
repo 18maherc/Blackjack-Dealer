@@ -3,10 +3,9 @@ from game_objects import *
 
 # ---- Game Functions: ----
 # function prompting the Player to Hit or Stand
-def action(deck: Deck, hand: Hand, player=None) -> bool:
+def action(deck: Deck, hand: Hand, player=None):
     while True:
-        x = input("Hit(h) Stand(s) Split(p) Double(d)? ")
-        split_var = False
+        x = input("Hit(h) Stand(s) Split(p) Double(d) Surrender(l)? ")
         try:
             if x[0].lower() == 'h':
                 hit(deck, hand)
@@ -14,17 +13,15 @@ def action(deck: Deck, hand: Hand, player=None) -> bool:
                 stand(hand)
             elif x[0].lower() == 'p' and player is not None:
                 split(deck, player)
-                split_var = True
             elif x[0].lower() == 'd':
                 double(deck, hand, player)
             elif x[0].lower() == 'l':
-                surrender(hand, player)
+                surrender(hand)
             else:
                 raise Exception("Invalid action. Please try again")
             break
         except Exception as e:
             print(e)
-    return split_var
 
 
 def hit(deck: Deck, hand: Hand):
@@ -54,13 +51,21 @@ def double(deck: Deck, hand: Hand, player: Player):
         raise Exception("Can only double down with a 2 card hand")
 
 
-def surrender(hand: Hand, player: Player):
+def surrender(hand: Hand):
     if len(hand.cards) == 2:
         print("Player surrenders this hand")
         hand.surrender_flag = True
         hand.done_flag = True
     else:
         raise Exception("Can only surrender on initial hand")
+
+
+def insurance(player: Player):
+    the_wager = player.hands[0].wager
+    if player.wallet >= 0.5*the_wager:
+
+    else:
+        raise Exception("Do not have enough credits to place insurance bet")
 
 
 # --- functions to display cards ---
@@ -224,16 +229,21 @@ while True:
         # Ask for each player's actions in the game
         for playernum in range(len(the_players)):
             player = the_players[playernum]
-            for handnum in range(len(player.hands)):
-                hand = player.hands[handnum]
-                hand_split = False
-                while hand.done_flag is not True and hand_split is not True:
-                    # Show current hand
-                    show_player(playernum, hand)
-                    # Prompt for Player to Hit or Stand
-                    hand_split = action(the_table.deck, hand, player)
-                # Show the final state of the hand
+            if dealer_hand.cards[0].value == 'Ace':
+                while True:
+                    try:
+                        # insurance?? y/n
+                        break
+                    except ValueError:
+                        print("You must enter y/n")
+            hand = player.hands[0]
+            while hand.done_flag is not True and player.split_flag is not True:
+                # Show current hand
                 show_player(playernum, hand)
+                # Prompt for Player to Hit or Stand
+                action(the_table.deck, hand, player)
+            # Show the final state of the hand
+            show_player(playernum, hand)
 
             if player.split_flag:
                 # Player split their hand so let's do that process again
@@ -248,6 +258,7 @@ while True:
                     # Show the final state of the hand
                     show_player(playernum, hand)
 
+        # Get rid of surrendered hands and refund partial wagers
         for playernum in range(len(the_players)):
             player = the_players[playernum]
             for hand in player.hands:
@@ -262,12 +273,13 @@ while True:
         # Show Dealer's cards
         show_dealer(dealer_hand)
 
-        # Show cards (but keep one dealer card hidden)
-        # for playernum in range(len(the_players)):
-        #    player = the_players[playernum]
-        #    for handnum in range(len(player.hands)):
-        #        show_player(playernum, player.hands[handnum])
+        # Handle insurance bets
+        if dealer_hand.score == 21 and dealer_hand.size == 2:
+            for player in the_players:
+                if player.insurance_flag is True:
+                    player.add_credits(3*0.5*player.hands[0].wager)
 
+        # Calculate any winning hands as necessary and show final balance
         for playernum in range(len(the_players)):
             player = the_players[playernum]
             for handnum in range(len(player.hands)):
