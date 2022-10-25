@@ -3,24 +3,28 @@ from game_objects import *
 
 # ---- Game Functions: ----
 # function prompting the Player to Hit or Stand
-def action(deck: Deck, hand: Hand, player=None):
+def action(deck: Deck, hand: Hand, player=None) -> bool:
     while True:
         x = input("Hit(h) Stand(s) Split(p) Double(d)? ")
-
+        split_var = False
         try:
             if x[0].lower() == 'h':
                 hit(deck, hand)
             elif x[0].lower() == 's':
                 stand(hand)
             elif x[0].lower() == 'p' and player is not None:
-                split(player)
+                split(deck, player)
+                split_var = True
             elif x[0].lower() == 'd':
                 double(deck, hand, player)
+            elif x[0].lower() == 'l':
+                surrender(hand, player)
             else:
                 raise Exception("Invalid action. Please try again")
             break
         except Exception as e:
             print(e)
+    return split_var
 
 
 def hit(deck: Deck, hand: Hand):
@@ -31,8 +35,10 @@ def stand(hand: Hand):
     hand.done_flag = True
 
 
-def split(player: Player):
+def split(deck: Deck, player: Player):
     player.split_hand()
+    player.hands[0].add_card(deck.deal())
+    player.hands[1].add_card(deck.deal())
 
 
 def double(deck: Deck, hand: Hand, player: Player):
@@ -46,6 +52,15 @@ def double(deck: Deck, hand: Hand, player: Player):
             raise Exception("Do not have enough credits to double down")
     else:
         raise Exception("Can only double down with a 2 card hand")
+
+
+def surrender(hand: Hand, player: Player):
+    if len(hand.cards) == 2:
+        print("Player surrenders this hand")
+        hand.surrender_flag = True
+        hand.done_flag = True
+    else:
+        raise Exception("Can only surrender on initial hand")
 
 
 # --- functions to display cards ---
@@ -206,20 +221,42 @@ while True:
 
         show_dealer_hidden(dealer_hand)
 
+        # Ask for each player's actions in the game
         for playernum in range(len(the_players)):
             player = the_players[playernum]
             for handnum in range(len(player.hands)):
                 hand = player.hands[handnum]
-                while hand.done_flag is not True:
+                hand_split = False
+                while hand.done_flag is not True and hand_split is not True:
                     # Show current hand
                     show_player(playernum, hand)
                     # Prompt for Player to Hit or Stand
-                    action(the_table.deck, hand, player)
+                    hand_split = action(the_table.deck, hand, player)
                 # Show the final state of the hand
                 show_player(playernum, hand)
 
+            if player.split_flag:
+                # Player split their hand so let's do that process again
+                for handnum in range(len(player.hands)):
+                    hand = player.hands[handnum]
+                    hand_split = False
+                    while hand.done_flag is not True and hand_split is not True:
+                        # Show current hand
+                        show_player(playernum, hand)
+                        # Prompt for Player to Hit or Stand
+                        action(the_table.deck, hand, player)
+                    # Show the final state of the hand
+                    show_player(playernum, hand)
+
+        for playernum in range(len(the_players)):
+            player = the_players[playernum]
+            for hand in player.hands:
+                if hand.surrender_flag == True:
+                    player.delete_hand(hand)
+                    player.add_credits(0.5*hand.wager)
+
         # Have Dealer play out its hand until reaching soft or hard 17
-        while dealer_hand.score < 17:
+        while dealer_hand.score < 17 and dealer_hand.score != 21:
             hit(the_table.deck, dealer_hand)
 
         # Show Dealer's cards
@@ -244,6 +281,7 @@ while True:
 
         if new_game[0].lower() == 'y':
             the_dealer.hand = Hand()
+            dealer_hand = the_dealer.hand
             for playernum in range(len(the_players)):
                 the_players[playernum].clear()
             continue
