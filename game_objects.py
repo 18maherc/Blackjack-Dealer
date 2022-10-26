@@ -58,6 +58,7 @@ class Player():
         self.hands = [starting_hand]
         self.wallet = 0
         self.split_flag = False
+        self.insurance_flag = False
 
     def add_hand(self, hand: Hand):
         self.hands.append(hand)
@@ -112,11 +113,13 @@ class Player():
         self.wallet += math.ceil(credits)
 
     def remove_credits(self, credits: int):
-        self.wallet -= credits
+        self.wallet -= math.ceil(credits)
 
     def clear(self):
         self.hands.clear()
         self.add_hand(Hand())
+        self.split_flag = False
+        self.insurance_flag = False
 
 
 class Dealer():

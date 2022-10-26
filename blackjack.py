@@ -39,7 +39,7 @@ def split(deck: Deck, player: Player):
 
 
 def double(deck: Deck, hand: Hand, player: Player):
-    if len(hand.cards):
+    if len(hand.cards) == 2:
         if player.wallet >= hand.wager:
             player.remove_credits(hand.wager)
             hit(deck, hand)
@@ -63,7 +63,8 @@ def surrender(hand: Hand):
 def insurance(player: Player):
     the_wager = player.hands[0].wager
     if player.wallet >= 0.5*the_wager:
-
+        player.insurance_flag = True
+        player.remove_credits(0.5*the_wager)
     else:
         raise Exception("Do not have enough credits to place insurance bet")
 
@@ -229,14 +230,23 @@ while True:
         # Ask for each player's actions in the game
         for playernum in range(len(the_players)):
             player = the_players[playernum]
+            # Check if dealer is showing Ace
             if dealer_hand.cards[0].value == 'Ace':
+                # Ask players if they want to place insurance bet
                 while True:
                     try:
-                        # insurance?? y/n
+                        ins_choice = input(
+                            "Would you like to place an insurance wager? (y/n) ")
+                        if ins_choice[0].lower() == 'y':
+                            insurance(player)
                         break
                     except ValueError:
                         print("You must enter y/n")
+                    except Exception as e:
+                        print(e)
+                        break
             hand = player.hands[0]
+            # Continuously ask Player for action until they are finished
             while hand.done_flag is not True and player.split_flag is not True:
                 # Show current hand
                 show_player(playernum, hand)
@@ -245,6 +255,7 @@ while True:
             # Show the final state of the hand
             show_player(playernum, hand)
 
+            # Check if the Player split their initial hand
             if player.split_flag:
                 # Player split their hand so let's do that process again
                 for handnum in range(len(player.hands)):
