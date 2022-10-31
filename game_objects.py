@@ -15,6 +15,7 @@ class Card():
         self.suit = suit
         self.value = value
         self.points = points[value]
+        self.coords = (0, 0)
 
     def to_string(self) -> str:
         return f"{self.value} of {self.suit}  ({self.points})"

@@ -298,15 +298,22 @@ while True:
                 print(
                     f"Player {playernum+1} you now have {player.wallet} credits.")
 
+        # End of game sequence
+        the_dealer.hand = Hand()
+        dealer_hand = the_dealer.hand
+        card_coords = []
+        for playernum in range(len(the_players)):
+            for hand in the_players[playernum]:
+                for card in hand:
+                    card_coords.append(card.coords)
+            the_players[playernum].clear()
+        communication.discard(communication.s, card_coords)
+
         # Ask to play again
         new_game = input(
             "Would you like to play another game? Enter 'y' or 'n' ")
 
         if new_game[0].lower() == 'y':
-            the_dealer.hand = Hand()
-            dealer_hand = the_dealer.hand
-            for playernum in range(len(the_players)):
-                the_players[playernum].clear()
             continue
         else:
             print("Thanks for playing!")
