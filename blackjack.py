@@ -1,4 +1,5 @@
 from game_objects import *
+from communication import Move
 
 
 # ---- Game Functions: ----
@@ -168,6 +169,8 @@ while True:
     # Print an opening statement
     print("Play a game of Blackjack!!")
 
+    move = Move()
+
     while True:
         try:
             num_of_players = int(input("How many players?? "))
@@ -307,7 +310,7 @@ while True:
                 for card in hand:
                     card_coords.append(card.coords)
             the_players[playernum].clear()
-        communication.discard(communication.s, card_coords)
+        move.discard(card_coords)
 
         # Ask to play again
         new_game = input(

@@ -29,8 +29,11 @@ class Hand():
         self.done_flag = False
         self.wager = 1
         self.surrender_flag = False
+        self.base_coords = (0, 0)
 
     def add_card(self, card: Card):
+        card.coords[0] = self.base_coords-2*(self.size-1)
+        card.coords[1] = self.base_coords-1*(self.size-1)
         self.size += 1
         self.cards.append(card)
         self.score += card.points
