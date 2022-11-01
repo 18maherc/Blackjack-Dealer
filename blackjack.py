@@ -67,12 +67,31 @@ while True:
 
         # Deal first card to every player and the dealer. Also set the wager
         for playernum in range(len(the_players)):
-            the_players[playernum].hands[0].add_card(the_table.deck.deal())
-        the_dealer.hand.add_card(the_table.deck.deal())
+            # Draw a physical card
+            move.draw()
+            # TODO: Read the physical card in
+            the_card = the_table.deck.deal()
+            # Represent the physical card digitally
+            the_players[playernum].hands[0].add_card(the_card)
+            # Place the card at its physical location after flipping
+            move.place(the_card.coords)
+        # Draw a physical card
+        move.draw()
+        # TODO: Read the physical card in
+        the_card = the_table.deck.deal()
+        # Represent the physical card digitally
+        the_dealer.hand.add_card(the_card)
+        # Place the card at its physical location without flipping
+        move.place(the_card.coords, dealer=True)
+
         # Deal second card to every player and the dealer
         for playernum in range(len(the_players)):
-            the_players[playernum].hands[0].add_card(the_table.deck.deal())
-        the_dealer.hand.add_card(the_table.deck.deal())
+            the_card = the_table.deck.deal()
+            the_players[playernum].hands[0].add_card(the_card)
+            move.place(the_card.coords)
+        the_table.deck.deal()
+        the_dealer.hand.add_card(the_card)
+        move.place(the_card.coords)
 
         # Show Dealer's initial hand with one card shown
         show_dealer_hidden(dealer_hand)
@@ -168,6 +187,9 @@ while True:
         else:
             print("Thanks for playing!")
             break
+
+    # TODO: Handle removal/addition of players frorm the table
+    # (Will require adjusting base coords)
 
     close_game = input("Would you like to close the game? (y/n) ")
     if close_game[0].lower() == 'y':

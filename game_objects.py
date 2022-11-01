@@ -1,5 +1,8 @@
+from ctypes import sizeof
 import random
 import math
+
+# TODO: clear all TODOs
 
 # Let's give the info of the card's suits, ranks and values
 suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
@@ -15,7 +18,8 @@ class Card():
         self.suit = suit
         self.value = value
         self.points = points[value]
-        self.coords = (0, 0)
+        self.coords = [20, 20]
+        # ^ TODO find out coordinate stuff here ^
 
     def to_string(self) -> str:
         return f"{self.value} of {self.suit}  ({self.points})"
@@ -29,11 +33,14 @@ class Hand():
         self.done_flag = False
         self.wager = 1
         self.surrender_flag = False
-        self.base_coords = (0, 0)
+        self.base_coords = [20, 20]
+        # ^ TODO find out coordinate stuff here ^
 
     def add_card(self, card: Card):
-        card.coords[0] = self.base_coords-2*(self.size-1)
-        card.coords[1] = self.base_coords-1*(self.size-1)
+        card.coords[0] = self.base_coords[0]-2*(self.size-1)
+        # ^ TODO find out coordinate stuff here ^
+        card.coords[1] = self.base_coords[1]-1*(self.size-1)
+        # ^ TODO find out coordinate stuff here ^
         self.size += 1
         self.cards.append(card)
         self.score += card.points
@@ -63,8 +70,14 @@ class Player():
         self.wallet = 0
         self.split_flag = False
         self.insurance_flag = False
+        self.base_coords = [20, 20]
 
     def add_hand(self, hand: Hand):
+        # Set the base coordinates of the new hand
+        hand.base_coords[0] = self.base_coords[0]
+        hand.base_coords[1] = self.base_coords[1] - 2*sizeof(self.hands)
+        # ^ TODO find out coordinate stuff here ^
+        # Add the new hand to the player
         self.hands.append(hand)
 
     def delete_hand(self, hand: Hand):
@@ -128,6 +141,8 @@ class Player():
 
 class Dealer():
     def __init__(self, hand: Hand):
+        hand.base_coords = [0, 10]
+        # ^ TODO find out coordinate stuff here ^
         self.hand = hand
 
 
@@ -169,7 +184,12 @@ class Table():
 
         # Add x number of players to the game
         for i in range(player_count):
-            self.players.append(Player(Hand()))
+            new_player = Player(Hand())
+            new_player.base_coords[0] = 20
+            # ^ TODO find out coordinate stuff here ^
+            new_player.base_coords[1] = 20 - 4*i
+            # ^ TODO find out coordinate stuff here ^
+            self.players.append(new_player)
 
         # Create & shuffle 3 decks together
         self.deck = Deck()
