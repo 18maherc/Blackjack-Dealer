@@ -24,7 +24,7 @@ class Move():
         print('Stream Complete')
 
     # s is the serial variable
-    # coord is the location the card needs to be placed; a tuple consisting of 2 values (x,y)
+    # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
     def place(self, coord, dealer=False, frate=400):
