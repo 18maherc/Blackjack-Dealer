@@ -2,12 +2,12 @@ from game_objects import *
 from game_functions import *
 from communication import Move
 
+move = Move()
+
 # ---- Game: ----
 while True:
     # Print an opening statement
     print("Play a game of Blackjack!!")
-
-    move = Move()
 
     # Get the number of players for the game
     while True:
@@ -20,12 +20,13 @@ while True:
 
     # Initialize our table
     the_table = Table(num_of_players)
-    the_dealer = the_table.dealer
-    the_players = the_table.players
-    dealer_hand = the_dealer.hand
 
     # Play the game
     while True:
+        the_dealer = the_table.dealer
+        the_players = the_table.players
+        dealer_hand = the_dealer.hand
+
         # Take bets for all players
         for playernum in range(len(the_players)):
             player = the_players[playernum]
@@ -86,9 +87,11 @@ while True:
 
         # Deal second card to every player and the dealer
         for playernum in range(len(the_players)):
+            move.draw()
             the_card = the_table.deck.deal()
             the_players[playernum].hands[0].add_card(the_card)
             move.place(the_card.coords)
+        move.draw()
         the_table.deck.deal()
         the_dealer.hand.add_card(the_card)
         move.place(the_card.coords)
@@ -120,7 +123,7 @@ while True:
                 # Show current hand
                 show_player(playernum, hand)
                 # Prompt for Player to Hit or Stand
-                action(the_table.deck, hand, player)
+                action(the_table.deck, hand, player)  # TODO: pass in 'move'
             # Show the final state of the hand
             show_player(playernum, hand)
 
@@ -134,21 +137,29 @@ while True:
                         # Show current hand
                         show_player(playernum, hand)
                         # Prompt for Player to Hit or Stand
+                        # TODO: pass in 'move'
                         action(the_table.deck, hand, player)
                     # Show the final state of the hand
                     show_player(playernum, hand)
 
         # Get rid of surrendered hands and refund partial wagers
+        # TODO: figure out if we want to just do this at the end (and have a surrender flag check for winnings)
+        surrender_coords = []
         for playernum in range(len(the_players)):
             player = the_players[playernum]
             for hand in player.hands:
                 if hand.surrender_flag == True:
+                    for card in hand:
+                        surrender_coords.append(card.coords)
                     player.delete_hand(hand)
                     player.add_credits(0.5*hand.wager)
+        move.discard(surrender_coords)
 
         # Have Dealer play out its hand until reaching soft or hard 17
         while dealer_hand.score < 17 and dealer_hand.score != 21:
+            # Use the hit function from game_functions
             hit(the_table.deck, dealer_hand)
+            # TODO: add motor functionality here
 
         # Show Dealer's cards
         show_dealer(dealer_hand)
@@ -167,10 +178,15 @@ while True:
                 print(
                     f"Player {playernum+1} you now have {player.wallet} credits.")
 
-        # End of game sequence
+        # -- End of game sequence --
+        card_coords = []
+        # Get the coordinates of the dealer's cards
+        for card in dealer_hand.cards:
+            card_coords.append[card.coords]
+        # Replace the dealer's hand
         the_dealer.hand = Hand()
         dealer_hand = the_dealer.hand
-        card_coords = []
+
         for playernum in range(len(the_players)):
             for hand in the_players[playernum]:
                 for card in hand:
