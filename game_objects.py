@@ -192,7 +192,7 @@ class Table():
             new_player = Player(Hand())
             new_player.base_coords[0] = 250
             # ^ TODO find out coordinate stuff here ^
-            new_player.base_coords[1] = 20 + 110*i
+            new_player.base_coords[1] = 80 + 110*i
             # ^ TODO find out coordinate stuff here ^
             self.players.append(new_player)
 
