@@ -27,16 +27,18 @@ class Move():
     # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
-    def place(self, coord, dealer=False, frate=5000):
-        if dealer:
-            f = ["G1X0Y0Z0F5000\n", "M03\n",
+    def place(self, coord2, coord1=[0,0], dealer=False, frate=5000):
+        f = [f"G01X{coord1[0]}Y{coord1[1]}Z0F{frate}\n", "M03\n",
                  "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
-        else:
-            f = ["G1X0Y0Z0F5000\n", "M03\n",
-                 "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
-#             f = ["flip\n", "unflip\n", "flipped\n", "M03\n",
-#                  "flipped + z\n", "G04P2\n", "flipped\n"]
-        d0 = f"G01X{coord[0]}Y{coord[1]}Z0F{frate}\n"
+#         if dealer:
+#             f = ["G1X0Y0Z0F5000\n", "M03\n",
+#                  "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+#         else:
+#             f = ["G1X0Y0Z0F5000\n", "M03\n",
+#                  "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+# #             f = ["flip\n", "unflip\n", "flipped\n", "M03\n",
+# #                  "flipped + z\n", "G04P2\n", "flipped\n"]
+        d0 = f"G01X{coord2[0]}Y{coord2[1]}Z0F{frate}\n"
         d1 = "M05\n"
         p1 = "G04P2\n"
         d2 = "G1X125Y0Z0F5000\n"
