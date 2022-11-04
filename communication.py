@@ -30,10 +30,10 @@ class Move():
     def place(self, coord, dealer=False, frate=5000):
         if dealer:
             f = ["G1X0Y0Z0F5000\n", "M03\n",
-                 "G1X0Y0Z-7F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+                 "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
         else:
             f = ["G1X0Y0Z0F5000\n", "M03\n",
-                 "G1X0Y0Z-7F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+                 "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
 #             f = ["flip\n", "unflip\n", "flipped\n", "M03\n",
 #                  "flipped + z\n", "G04P2\n", "flipped\n"]
         d0 = f"G01X{coord[0]}Y{coord[1]}Z0F{frate}\n"
@@ -57,7 +57,7 @@ class Move():
         for c in stack:
             f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}\n"]
             von = "S1000M03\n"
-            d1 = f"G01X{c[0]}Y{c[1]}Z1F100\nG04P2\n"
+            d1 = f"G01X{c[0]}Y{c[1]}Z-7.5F100\nG04P2\n"
             d2 = "G1X250Y0Z0\nM05\nG04P2\n"
             f.extend([f, von, d1, f, d2])
             for line in f:
