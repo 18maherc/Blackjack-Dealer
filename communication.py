@@ -12,8 +12,8 @@ class Move():
         self.s.flushInput()  # Flush startup text in serial input
 
     def draw(self):
-        f = ["draw\n", "S1000M03\n", "draw + z\n", "G04P2\n",
-             "draw\n", "flipper\n", "M05\n", "flipper + y\n"]
+        f = ["G1X125Y0Z0F5000\n", "S1000M03\n", "G1X125Y0Z-7F100\n", "G04P2\n",
+             "G1X125Y0Z0F200\n", "G1X0Y0Z0F5000\n", "M05\n", "G04P2\n"]
         # Stream g-code to grbl
         for line in f:
             l = line.strip()  # Strip all EOL characters for consistency
@@ -27,16 +27,18 @@ class Move():
     # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
-    def place(self, coord, dealer=False, frate=400):
+    def place(self, coord, dealer=False, frate=5000):
         if dealer:
-            f = ["flipper\n", "M03\n", "flipper + z\n", "G04P2\n", "flipper\n"]
+            f = ["G1X0Y0Z0F5000\n", "M03\n", "G1X0Y0Z-7F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
         else:
-            f = ["flip\n", "unflip\n", "flipped\n", "M03\n",
-                 "flipped + z\n", "G04P2\n", "flipped\n"]
+            f = ["G1X0Y0Z0F5000\n", "M03\n", "G1X0Y0Z-7F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+#             f = ["flip\n", "unflip\n", "flipped\n", "M03\n",
+#                  "flipped + z\n", "G04P2\n", "flipped\n"]
         d0 = f"G01X{coord[0]}Y{coord[1]}Z0F{frate}\n"
         d1 = "M05\n"
-        d2 = "draw\n"
-        f.extend([d0, d1, d2])
+        p1 = "G04P2\n"
+        d2 = "G1X125Y0Z0F5000\n"
+        f.extend([d0, d1, p1, d2])
 
         # Stream g-code to grbl
         for line in f:
@@ -49,12 +51,12 @@ class Move():
 
     # s is the serial variable
     # c is a stack of every location a card has been placed; each entry contains a list [x,y]
-    def discard(self, stack, frate=400):
+    def discard(self, stack, frate=5000):
         for c in stack:
             f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}\n"]
             von = "S1000M03\n"
-            d1 = f"G01X{c[0]}Y{c[1]}Z1F30\nG04P2\n"
-            d2 = "discard\nM05"
+            d1 = f"G01X{c[0]}Y{c[1]}Z1F100\nG04P2\n"
+            d2 = "G1X250Y0Z0\nM05\nG04P2\n"
             f.extend([f, von, d1, f, d2])
             for line in f:
                 l = line.strip()  # Strip all EOL characters for consistency
@@ -65,8 +67,8 @@ class Move():
             print('Stream Complete')
 
     def setG(self):
-        f = ["$1=255", "$100=200", "$101=200",
-             "$102=100", "$120=20", "$121=20", "$122=4"]
+        f = ["$1=255", "$100=40", "$101=40",
+             "$102=100", "$110=5000", "$111=5000", "$120=100", "$121=100", "$122=4"]
         # Stream g-code to grbl
         for line in f:
             l = line.strip()  # Strip all EOL characters for consistency
