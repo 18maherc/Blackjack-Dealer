@@ -26,6 +26,7 @@ while True:
         the_dealer = the_table.dealer
         the_players = the_table.players
         dealer_hand = the_dealer.hand
+        card_stack = []
 
         # Take bets for all players
         for playernum in range(len(the_players)):
@@ -72,6 +73,7 @@ while True:
             move.draw()
             # TODO: Read the physical card in
             the_card = the_table.deck.deal()
+            # TODO: add the card to the card_stack
             # Represent the physical card digitally
             the_players[playernum].hands[0].add_card(the_card)
             # Place the card at its physical location after flipping
@@ -80,6 +82,7 @@ while True:
         move.draw()
         # TODO: Read the physical card in
         the_card = the_table.deck.deal()
+        # TODO: add the card to the card_stack
         # Represent the physical card digitally
         the_dealer.hand.add_card(the_card)
         # Place the card at its physical location without flipping
@@ -89,10 +92,12 @@ while True:
         for playernum in range(len(the_players)):
             move.draw()
             the_card = the_table.deck.deal()
+            # TODO: add the card to the card_stack
             the_players[playernum].hands[0].add_card(the_card)
             move.place(the_card.coords)
         move.draw()
         the_table.deck.deal()
+        # TODO: add the card to the card_stack
         the_dealer.hand.add_card(the_card)
         move.place(the_card.coords)
 

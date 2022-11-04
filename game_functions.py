@@ -10,6 +10,7 @@ def action(deck: Deck, hand: Hand, player=None):
         try:
             if x[0].lower() == 'h':
                 hit(deck, hand)
+                # TODO: add card to card_stack
             elif x[0].lower() == 's':
                 stand(hand)
             elif x[0].lower() == 'p' and player is not None:

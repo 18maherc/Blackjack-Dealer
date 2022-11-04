@@ -10,6 +10,7 @@ values = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
           'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace')
 points = {'Two': 2, 'Three': 3, 'Four': 4, 'Five': 5, 'Six': 6, 'Seven': 7, 'Eight': 8, 'Nine': 9, 'Ten': 10, 'Jack': 10,
           'Queen': 10, 'King': 10, 'Ace': 11}
+card_stack = []
 
 
 # Game Objects:
@@ -70,17 +71,19 @@ class Player():
         self.wallet = 0
         self.split_flag = False
         self.insurance_flag = False
-        self.base_coords = [20, 20]
+        self.base_coords = [250, 75]
 
     def add_hand(self, hand: Hand):
         # Set the base coordinates of the new hand
         hand.base_coords[0] = self.base_coords[0]
-        hand.base_coords[1] = self.base_coords[1] - 2*sizeof(self.hands)
+        hand.base_coords[1] = self.base_coords[1] + 25*sizeof(self.hands)
         # ^ TODO find out coordinate stuff here ^
         # Add the new hand to the player
         self.hands.append(hand)
 
     def delete_hand(self, hand: Hand):
+        for card in hand.cards[0]:
+            card_stack.remove(card)
         self.hands.remove(hand)
 
     def split_hand(self):
@@ -141,7 +144,7 @@ class Player():
 
 class Dealer():
     def __init__(self, hand: Hand):
-        hand.base_coords = [0, 10]
+        hand.base_coords = [0, 165]
         # ^ TODO find out coordinate stuff here ^
         self.hand = hand
 
