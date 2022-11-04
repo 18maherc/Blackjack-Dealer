@@ -19,7 +19,7 @@ class Card():
         self.suit = suit
         self.value = value
         self.points = points[value]
-        self.coords = [20, 20]
+        self.coords = [250, 80]
         # ^ TODO find out coordinate stuff here ^
 
     def to_string(self) -> str:
@@ -34,13 +34,13 @@ class Hand():
         self.done_flag = False
         self.wager = 1
         self.surrender_flag = False
-        self.base_coords = [20, 20]
+        self.base_coords = [250, 80]
         # ^ TODO find out coordinate stuff here ^
 
     def add_card(self, card: Card):
-        card.coords[0] = self.base_coords[0]-2*(self.size-1)
+        card.coords[0] = self.base_coords[0] - 25*(self.size)
         # ^ TODO find out coordinate stuff here ^
-        card.coords[1] = self.base_coords[1]-1*(self.size-1)
+        card.coords[1] = self.base_coords[1]
         # ^ TODO find out coordinate stuff here ^
         self.size += 1
         self.cards.append(card)
@@ -57,6 +57,8 @@ class Hand():
                 self.done_flag = True  # No aces to left to reduce so flag their bust as done
         elif self.score == 21:
             self.done_flag = True  # auto-stand when player hits 21
+        # Add the card to the card_stack
+        card_stack.append(card)
 
     def contains(self, card: Card) -> bool:
         for c in self.cards:
@@ -71,7 +73,7 @@ class Player():
         self.wallet = 0
         self.split_flag = False
         self.insurance_flag = False
-        self.base_coords = [250, 75]
+        self.base_coords = [250, 80]
 
     def add_hand(self, hand: Hand):
         # Set the base coordinates of the new hand
@@ -188,9 +190,9 @@ class Table():
         # Add x number of players to the game
         for i in range(player_count):
             new_player = Player(Hand())
-            new_player.base_coords[0] = 20
+            new_player.base_coords[0] = 250
             # ^ TODO find out coordinate stuff here ^
-            new_player.base_coords[1] = 20 - 4*i
+            new_player.base_coords[1] = 20 + 110*i
             # ^ TODO find out coordinate stuff here ^
             self.players.append(new_player)
 

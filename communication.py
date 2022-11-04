@@ -5,7 +5,7 @@ import time
 class Move():
     def __init__(self):
         # Open grbl serial port, 'COM13' will need replaced with the corresponding RPi port
-        self.s = serial.Serial('COM13', 115200)
+        self.s = serial.Serial('COM3', 115200)
         # Wake up grbl
         self.s.write(str.encode('\r\n\r\n'))
         time.sleep(2)   # Wait for grbl to initialize
@@ -29,9 +29,11 @@ class Move():
     # frate = feedrate, speed at which the move is executed
     def place(self, coord, dealer=False, frate=5000):
         if dealer:
-            f = ["G1X0Y0Z0F5000\n", "M03\n", "G1X0Y0Z-7F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+            f = ["G1X0Y0Z0F5000\n", "M03\n",
+                 "G1X0Y0Z-7F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
         else:
-            f = ["G1X0Y0Z0F5000\n", "M03\n", "G1X0Y0Z-7F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+            f = ["G1X0Y0Z0F5000\n", "M03\n",
+                 "G1X0Y0Z-7F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
 #             f = ["flip\n", "unflip\n", "flipped\n", "M03\n",
 #                  "flipped + z\n", "G04P2\n", "flipped\n"]
         d0 = f"G01X{coord[0]}Y{coord[1]}Z0F{frate}\n"

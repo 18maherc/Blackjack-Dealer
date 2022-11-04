@@ -26,7 +26,6 @@ while True:
         the_dealer = the_table.dealer
         the_players = the_table.players
         dealer_hand = the_dealer.hand
-        card_stack = []
 
         # Take bets for all players
         for playernum in range(len(the_players)):
@@ -73,7 +72,6 @@ while True:
             move.draw()
             # TODO: Read the physical card in
             the_card = the_table.deck.deal()
-            # TODO: add the card to the card_stack
             # Represent the physical card digitally
             the_players[playernum].hands[0].add_card(the_card)
             # Place the card at its physical location after flipping
@@ -82,7 +80,6 @@ while True:
         move.draw()
         # TODO: Read the physical card in
         the_card = the_table.deck.deal()
-        # TODO: add the card to the card_stack
         # Represent the physical card digitally
         the_dealer.hand.add_card(the_card)
         # Place the card at its physical location without flipping
@@ -92,12 +89,10 @@ while True:
         for playernum in range(len(the_players)):
             move.draw()
             the_card = the_table.deck.deal()
-            # TODO: add the card to the card_stack
             the_players[playernum].hands[0].add_card(the_card)
             move.place(the_card.coords)
         move.draw()
         the_table.deck.deal()
-        # TODO: add the card to the card_stack
         the_dealer.hand.add_card(the_card)
         move.place(the_card.coords)
 
@@ -184,20 +179,15 @@ while True:
                     f"Player {playernum+1} you now have {player.wallet} credits.")
 
         # -- End of game sequence --
-        card_coords = []
-        # Get the coordinates of the dealer's cards
-        for card in dealer_hand.cards:
-            card_coords.append[card.coords]
         # Replace the dealer's hand
         the_dealer.hand = Hand()
         dealer_hand = the_dealer.hand
-
+        # Reset the players
         for playernum in range(len(the_players)):
-            for hand in the_players[playernum]:
-                for card in hand:
-                    card_coords.append(card.coords)
             the_players[playernum].clear()
-        move.discard(card_coords)
+        # Physically collect all cards
+        move.discard(card_stack)
+        card_stack = []
 
         # Ask to play again
         new_game = input(
