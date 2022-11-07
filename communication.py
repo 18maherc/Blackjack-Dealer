@@ -12,7 +12,7 @@ class Move():
         self.s.flushInput()  # Flush startup text in serial input
 
     def draw(self, c):
-        zoff = -5.5 - (2*c/52)
+        zoff = -4.5 - (3*c/52)
         zoff = round(zoff,2)
         f = ["G1X125Y0Z0F5000\n", "S1000M03\n", f"G1X125Y0Z{zoff}F100\n", "G04P2\n",
              "G1X125Y0Z0F200\n", "G1X0Y0Z0F5000\n", "M05\n", "G04P2\n"]
@@ -31,13 +31,13 @@ class Move():
     # frate = feedrate, speed at which the move is executed
     def place(self, coord2, coord1=[0, 0], dealer=False, frate=5000):
         f = [f"G01X{coord1[0]}Y{coord1[1]}Z0F{frate}\n", "M03\n",
-             f"G1X{coord1[0]}Y{coord1[1]}Z-7.5F100\n", "G04P2\n", f"G01X{coord1[0]}Y{coord1[1]}Z0F{200}\n"]
+             f"G1X{coord1[0]}Y{coord1[1]}Z-7.0F100\n", "G04P2\n", f"G01X{coord1[0]}Y{coord1[1]}Z0F{200}\n"]
 #         if dealer:
 #             f = ["G1X0Y0Z0F5000\n", "M03\n",
-#                  "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+#                  "G1X0Y0Z-7.0F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
 #         else:
 #             f = ["G1X0Y0Z0F5000\n", "M03\n",
-#                  "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+#                  "G1X0Y0Z-7.0F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
 # #             f = ["flip\n", "unflip\n", "flipped\n", "M03\n",
 # #                  "flipped + z\n", "G04P2\n", "flipped\n"]
         d0 = f"G01X{coord2[0]}Y{coord2[1]}Z0F{frate}\n"
@@ -59,9 +59,9 @@ class Move():
     # c is a stack of every location a card has been placed; each entry contains a list [x,y]
     def discard(self, stack, frate=5000):
         for c in stack:
-            f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}\n","S1000M03\n",f"G01X{c[0]}Y{c[1]}Z-7.5F100\n","G04P2\n",f"G01X{c[0]}Y{c[1]}Z0F{frate}\n","G1X250Y0Z0\n","M05\n","G04P2\n"]
+            f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}\n","S1000M03\n",f"G01X{c[0]}Y{c[1]}Z-7.0F100\n","G04P2\n",f"G01X{c[0]}Y{c[1]}Z0F{frate}\n","G1X250Y0Z0\n","M05\n","G04P2\n"]
 #             von = "S1000M03\n"
-#             d1 = f"G01X{c[0]}Y{c[1]}Z-7.5F100\nG04P2\n"
+#             d1 = f"G01X{c[0]}Y{c[1]}Z-7.0F100\nG04P2\n"
 #             d2 = "G1X250Y0Z0\nM05\nG04P2\n"
 #             f.extend([von, d1, f, d2])
             for line in f:
