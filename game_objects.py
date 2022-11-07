@@ -67,9 +67,48 @@ class Hand():
         return False
 
 
+class DealerHand():
+    def __init__(self):
+        self.size = 0
+        self.cards = []  # list of  cards
+        self.score = 0
+        self.done_flag = False
+        self.base_coords = [0, 165]
+        # ^ TODO find out coordinate stuff here ^
+
+    def add_card(self, card: Card):
+        card.coords[0] = self.base_coords[0]
+        # ^ TODO find out coordinate stuff here ^
+        card.coords[1] = self.base_coords[1] + 25*(self.size)
+        # ^ TODO find out coordinate stuff here ^
+        self.size += 1
+        self.cards.append(card)
+        self.score += card.points
+        if self.score > 21:
+            ace_reduced = True  # Flag for when no aces exist with value 11
+            for c in self.cards:
+                if c.value == 'Ace' and c.points == 11:
+                    self.score -= 10
+                    c.points = 1
+                    ace_reduced = False
+                    break
+            if ace_reduced:
+                self.done_flag = True  # No aces to left to reduce so flag their bust as done
+        elif self.score == 21:
+            self.done_flag = True  # auto-stand when player hits 21
+        # Add the card to the card_stack
+        card_stack.append(card)
+
+    def contains(self, card: Card) -> bool:
+        for c in self.cards:
+            if card.value == c.value:
+                return True
+        return False
+
+
 class Player():
-    def __init__(self, starting_hand: Hand):
-        self.hands = [starting_hand]
+    def __init__(self):
+        self.hands = []
         self.wallet = 0
         self.split_flag = False
         self.insurance_flag = False
@@ -78,7 +117,7 @@ class Player():
     def add_hand(self, hand: Hand):
         # Set the base coordinates of the new hand
         hand.base_coords[0] = self.base_coords[0]
-        hand.base_coords[1] = self.base_coords[1] + 25*sizeof(self.hands)
+        hand.base_coords[1] = self.base_coords[1] + 25*len(self.hands)
         # ^ TODO find out coordinate stuff here ^
         # Add the new hand to the player
         self.hands.append(hand)
@@ -145,7 +184,7 @@ class Player():
 
 
 class Dealer():
-    def __init__(self, hand: Hand):
+    def __init__(self, hand: DealerHand):
         hand.base_coords = [0, 165]
         # ^ TODO find out coordinate stuff here ^
         self.hand = hand
@@ -185,15 +224,16 @@ class Table():
         # Initialize our collection of players
         self.players = []
         # Initialize our Dealer
-        self.dealer = Dealer(Hand())
+        self.dealer = Dealer(DealerHand())
 
         # Add x number of players to the game
         for i in range(player_count):
-            new_player = Player(Hand())
+            new_player = Player()
             new_player.base_coords[0] = 250
             # ^ TODO find out coordinate stuff here ^
             new_player.base_coords[1] = 80 + 110*i
             # ^ TODO find out coordinate stuff here ^
+            new_player.add_hand(Hand())
             self.players.append(new_player)
 
         # Create & shuffle 3 decks together
