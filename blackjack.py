@@ -123,7 +123,7 @@ while True:
                 # Show current hand
                 show_player(playernum, hand)
                 # Prompt for Player to Hit or Stand
-                action(the_table.deck, hand, player)  # TODO: pass in 'move'
+                action(the_table.deck, hand, player, move)
             # Show the final state of the hand
             show_player(playernum, hand)
 
@@ -138,7 +138,7 @@ while True:
                         show_player(playernum, hand)
                         # Prompt for Player to Hit or Stand
                         # TODO: pass in 'move'
-                        action(the_table.deck, hand, player)
+                        action(the_table.deck, hand, player, move)
                     # Show the final state of the hand
                     show_player(playernum, hand)
 
@@ -158,8 +158,8 @@ while True:
         # Have Dealer play out its hand until reaching soft or hard 17
         while dealer_hand.score < 17 and dealer_hand.score != 21:
             # Use the hit function from game_functions
-            hit(the_table.deck, dealer_hand)
-            # TODO: add motor functionality here
+            hit(the_table.deck, dealer_hand, move)
+            # TODO: add motor functionality here --------------------------
 
         # Show Dealer's cards
         show_dealer(dealer_hand)

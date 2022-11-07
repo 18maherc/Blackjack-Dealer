@@ -58,7 +58,7 @@ class Hand():
         elif self.score == 21:
             self.done_flag = True  # auto-stand when player hits 21
         # Add the card to the card_stack
-        card_stack.append(card)
+        card_stack.append(card.coords)
 
     def contains(self, card: Card) -> bool:
         for c in self.cards:
