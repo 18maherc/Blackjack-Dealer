@@ -58,11 +58,11 @@ class Move():
     # c is a stack of every location a card has been placed; each entry contains a list [x,y]
     def discard(self, stack, frate=5000):
         for c in stack:
-            f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}\n"]
-            von = "S1000M03\n"
-            d1 = f"G01X{c[0]}Y{c[1]}Z-7.5F100\nG04P2\n"
-            d2 = "G1X250Y0Z0\nM05\nG04P2\n"
-            f.extend([f, von, d1, f, d2])
+            f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}\n","S1000M03\n",f"G01X{c[0]}Y{c[1]}Z-7.5F100\n","G04P2\n",f"G01X{c[0]}Y{c[1]}Z0F{frate}\n","G1X250Y0Z0\n","M05\n","G04P2\n"]
+#             von = "S1000M03\n"
+#             d1 = f"G01X{c[0]}Y{c[1]}Z-7.5F100\nG04P2\n"
+#             d2 = "G1X250Y0Z0\nM05\nG04P2\n"
+#             f.extend([von, d1, f, d2])
             for line in f:
                 l = line.strip()  # Strip all EOL characters for consistency
                 print('Sending: ' + l)
