@@ -12,8 +12,8 @@ class Move():
         self.s.flushInput()  # Flush startup text in serial input
 
     def draw(self, c):
-        zoff = f"G1X125Y0Z{-5.5 - 2*c/52}F100\n"
-        f = ["G1X125Y0Z0F5000\n", "S1000M03\n", zoff, "G04P2\n",
+        zoff = -5.5 - (2*c/52)
+        f = ["G1X125Y0Z0F5000\n", "S1000M03\n", f"G1X125Y0Z{zoff}F100\n", "G04P2\n",
              "G1X125Y0Z0F200\n", "G1X0Y0Z0F5000\n", "M05\n", "G04P2\n"]
         # Stream g-code to grbl
         for line in f:
