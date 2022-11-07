@@ -69,7 +69,7 @@ while True:
         # Deal first card to every player and the dealer. Also set the wager
         for playernum in range(len(the_players)):
             # Draw a physical card
-            move.draw()
+            move.draw(len(card_stack))
             # TODO: Read the physical card in
             the_card = the_table.deck.deal()
             # Represent the physical card digitally
@@ -77,7 +77,7 @@ while True:
             # Place the card at its physical location after flipping
             move.place(the_card.coords)
         # Draw a physical card
-        move.draw()
+        move.draw(len(card_stack))
         # TODO: Read the physical card in
         the_card = the_table.deck.deal()
         # Represent the physical card digitally
@@ -87,11 +87,11 @@ while True:
 
         # Deal second card to every player and the dealer
         for playernum in range(len(the_players)):
-            move.draw()
+            move.draw(len(card_stack))
             the_card = the_table.deck.deal()
             the_players[playernum].hands[0].add_card(the_card)
             move.place(the_card.coords)
-        move.draw()
+        move.draw(len(card_stack))
         the_table.deck.deal()
         the_dealer.hand.add_card(the_card)
         move.place(the_card.coords)

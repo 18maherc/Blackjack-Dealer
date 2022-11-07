@@ -58,7 +58,7 @@ class Hand():
         elif self.score == 21:
             self.done_flag = True  # auto-stand when player hits 21
         # Add the card to the card_stack
-        card_stack.append(card.coords)
+        card_stack.insert(0, card.coords)
 
     def contains(self, card: Card) -> bool:
         for c in self.cards:
@@ -97,7 +97,7 @@ class DealerHand():
         elif self.score == 21:
             self.done_flag = True  # auto-stand when player hits 21
         # Add the card to the card_stack
-        card_stack.append(card)
+        card_stack.insert(0, card.coords)
 
     def contains(self, card: Card) -> bool:
         for c in self.cards:
@@ -123,8 +123,8 @@ class Player():
         self.hands.append(hand)
 
     def delete_hand(self, hand: Hand):
-        for card in hand.cards[0]:
-            card_stack.remove(card)
+        for card in hand.cards:
+            card_stack.remove(card.coords)
         self.hands.remove(hand)
 
     def split_hand(self):

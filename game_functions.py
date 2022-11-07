@@ -27,7 +27,7 @@ def action(deck: Deck, hand: Hand, player: Player, move: Move):
 
 
 def hit(deck: Deck, hand: Hand, move: Move):
-    move.draw()
+    move.draw(len(card_stack))
     # TODO: read physical card in
     hand.add_card(deck.deal())
     move.place(hand.cards[-1].coords)
