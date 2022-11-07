@@ -12,7 +12,7 @@ class Move():
         self.s.flushInput()  # Flush startup text in serial input
 
     def draw(self, c):
-        zoff = f"G1X125Y0Z{-6.0 - 1.5*c/52}F100\n"
+        zoff = f"G1X125Y0Z{-5.5 - 2*c/52}F100\n"
         f = ["G1X125Y0Z0F5000\n", "S1000M03\n", zoff, "G04P2\n",
              "G1X125Y0Z0F200\n", "G1X0Y0Z0F5000\n", "M05\n", "G04P2\n"]
         # Stream g-code to grbl
@@ -30,7 +30,7 @@ class Move():
     # frate = feedrate, speed at which the move is executed
     def place(self, coord2, coord1=[0, 0], dealer=False, frate=5000):
         f = [f"G01X{coord1[0]}Y{coord1[1]}Z0F{frate}\n", "M03\n",
-             "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
+             f"G1X{coord1[0]}Y{coord1[1]}Z-7.5F100\n", "G04P2\n", f"G01X{coord1[0]}Y{coord1[1]}Z0F{200}\n"]
 #         if dealer:
 #             f = ["G1X0Y0Z0F5000\n", "M03\n",
 #                  "G1X0Y0Z-7.5F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
