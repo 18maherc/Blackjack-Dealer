@@ -13,6 +13,7 @@ class Move():
 
     def draw(self, c):
         zoff = -5.5 - (2*c/52)
+        zoff = round(zoff,2)
         f = ["G1X125Y0Z0F5000\n", "S1000M03\n", f"G1X125Y0Z{zoff}F100\n", "G04P2\n",
              "G1X125Y0Z0F200\n", "G1X0Y0Z0F5000\n", "M05\n", "G04P2\n"]
         # Stream g-code to grbl
