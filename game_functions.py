@@ -1,21 +1,22 @@
 from game_objects import *
+from communication import Move
 
 
 # ---- Game Functions: ----
 
 # function prompting the Player to Hit or Stand
-def action(deck: Deck, hand: Hand, player=None):
+def action(deck: Deck, hand: Hand, player: Player, move: Move):
     while True:
         x = input("Hit(h) Stand(s) Split(p) Double(d) Surrender(l)? ")
         try:
             if x[0].lower() == 'h':
-                hit(deck, hand)
+                hit(deck, hand, move)
             elif x[0].lower() == 's':
                 stand(hand)
             elif x[0].lower() == 'p' and player is not None:
-                split(deck, player)
+                split(deck, player, move)
             elif x[0].lower() == 'd':
-                double(deck, hand, player)
+                double(deck, hand, player, move)
             elif x[0].lower() == 'l':
                 surrender(hand)
             else:
@@ -25,25 +26,30 @@ def action(deck: Deck, hand: Hand, player=None):
             print(e)
 
 
-def hit(deck: Deck, hand: Hand):
+def hit(deck: Deck, hand: Hand, move: Move):
+    move.draw(len(card_stack))
+    # TODO: read physical card in
     hand.add_card(deck.deal())
+    move.place(hand.cards[-1].coords)
 
 
 def stand(hand: Hand):
     hand.done_flag = True
 
 
-def split(deck: Deck, player: Player):
+def split(deck: Deck, player: Player, move: Move):
     player.split_hand()
-    player.hands[0].add_card(deck.deal())
-    player.hands[1].add_card(deck.deal())
+    hit(deck, player.hands[0], move)
+    hit(deck, player.hands[1], move)
+    # player.hands[0].add_card(deck.deal())
+    # player.hands[1].add_card(deck.deal())
 
 
-def double(deck: Deck, hand: Hand, player: Player):
+def double(deck: Deck, hand: Hand, player: Player, move: Move):
     if len(hand.cards) == 2:
         if player.wallet >= hand.wager:
             player.remove_credits(hand.wager)
-            hit(deck, hand)
+            hit(deck, hand, move)
             hand.wager *= 2
             hand.done_flag = True
         else:

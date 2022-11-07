@@ -1,5 +1,8 @@
 from game_objects import *
 from game_functions import *
+from communication import Move
+
+move = Move()
 
 # ---- Game: ----
 while True:
@@ -17,12 +20,13 @@ while True:
 
     # Initialize our table
     the_table = Table(num_of_players)
-    the_dealer = the_table.dealer
-    the_players = the_table.players
-    dealer_hand = the_dealer.hand
 
     # Play the game
     while True:
+        the_dealer = the_table.dealer
+        the_players = the_table.players
+        dealer_hand = the_dealer.hand
+
         # Take bets for all players
         for playernum in range(len(the_players)):
             player = the_players[playernum]
@@ -64,12 +68,33 @@ while True:
 
         # Deal first card to every player and the dealer. Also set the wager
         for playernum in range(len(the_players)):
-            the_players[playernum].hands[0].add_card(the_table.deck.deal())
-        the_dealer.hand.add_card(the_table.deck.deal())
+            # Draw a physical card
+            move.draw(len(card_stack))
+            # TODO: Read the physical card in
+            the_card = the_table.deck.deal()
+            # Represent the physical card digitally
+            the_players[playernum].hands[0].add_card(the_card)
+            # Place the card at its physical location after flipping
+            move.place(the_card.coords)
+        # Draw a physical card
+        move.draw(len(card_stack))
+        # TODO: Read the physical card in
+        the_card = the_table.deck.deal()
+        # Represent the physical card digitally
+        the_dealer.hand.add_card(the_card)
+        # Place the card at its physical location without flipping
+        move.place(the_card.coords, dealer=True)
+
         # Deal second card to every player and the dealer
         for playernum in range(len(the_players)):
-            the_players[playernum].hands[0].add_card(the_table.deck.deal())
-        the_dealer.hand.add_card(the_table.deck.deal())
+            move.draw(len(card_stack))
+            the_card = the_table.deck.deal()
+            the_players[playernum].hands[0].add_card(the_card)
+            move.place(the_card.coords)
+        move.draw(len(card_stack))
+        the_table.deck.deal()
+        the_dealer.hand.add_card(the_card)
+        move.place(the_card.coords)
 
         # Show Dealer's initial hand with one card shown
         show_dealer_hidden(dealer_hand)
@@ -98,7 +123,7 @@ while True:
                 # Show current hand
                 show_player(playernum, hand)
                 # Prompt for Player to Hit or Stand
-                action(the_table.deck, hand, player)
+                action(the_table.deck, hand, player, move)
             # Show the final state of the hand
             show_player(playernum, hand)
 
@@ -112,21 +137,29 @@ while True:
                         # Show current hand
                         show_player(playernum, hand)
                         # Prompt for Player to Hit or Stand
-                        action(the_table.deck, hand, player)
+                        # TODO: pass in 'move'
+                        action(the_table.deck, hand, player, move)
                     # Show the final state of the hand
                     show_player(playernum, hand)
 
         # Get rid of surrendered hands and refund partial wagers
+        # TODO: figure out if we want to just do this at the end (and have a surrender flag check for winnings)
+        surrender_coords = []
         for playernum in range(len(the_players)):
             player = the_players[playernum]
             for hand in player.hands:
                 if hand.surrender_flag == True:
+                    for card in hand:
+                        surrender_coords.append(card.coords)
                     player.delete_hand(hand)
                     player.add_credits(0.5*hand.wager)
+        move.discard(surrender_coords)
 
         # Have Dealer play out its hand until reaching soft or hard 17
         while dealer_hand.score < 17 and dealer_hand.score != 21:
-            hit(the_table.deck, dealer_hand)
+            # Use the hit function from game_functions
+            hit(the_table.deck, dealer_hand, move)
+            # TODO: add motor functionality here --------------------------
 
         # Show Dealer's cards
         show_dealer(dealer_hand)
@@ -145,19 +178,29 @@ while True:
                 print(
                     f"Player {playernum+1} you now have {player.wallet} credits.")
 
+        # -- End of game sequence --
+        # Replace the dealer's hand
+        the_dealer.hand = Hand()
+        dealer_hand = the_dealer.hand
+        # Reset the players
+        for playernum in range(len(the_players)):
+            the_players[playernum].clear()
+        # Physically collect all cards
+        move.discard(card_stack)
+        card_stack = []
+
         # Ask to play again
         new_game = input(
             "Would you like to play another game? Enter 'y' or 'n' ")
 
         if new_game[0].lower() == 'y':
-            the_dealer.hand = Hand()
-            dealer_hand = the_dealer.hand
-            for playernum in range(len(the_players)):
-                the_players[playernum].clear()
             continue
         else:
             print("Thanks for playing!")
             break
+
+    # TODO: Handle removal/addition of players frorm the table
+    # (Will require adjusting base coords)
 
     close_game = input("Would you like to close the game? (y/n) ")
     if close_game[0].lower() == 'y':
