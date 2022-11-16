@@ -1,56 +1,62 @@
 #:kivy 1.0
 
-<SplashScreen>:
-    BoxLayout:
-        orientation: 'vertical'
-        Image:
-            source: 'logo.png'
-            size_hint: (1, 0.7)
-        Button:
-            text: 'Start'
-            size_hint: (1, 0.3)
-            background_normal: ''
-            background_color: (0.1, 1, 0.1, 0.5)
-            on_press: root.manager.current = 'startgame'
-
-<StartGameScreen>:
-    BoxLayout:
-        orientation: 'vertical'
-        Label:
-            id: 'choose_players_label'
-            text: 'Choose the number of players:'
-            size: self.texture_size
-            font_size: 30
-            size_hint: 1,0.4
+<ScreenManager>:
+    playernum: int(1)
+    SplashScreen:
+        id: 'splashscreen'
+        name: 'splashscreen'
         BoxLayout:
-            orientation: 'horizontal'
-            size_hint: 1,0.3
+            orientation: 'vertical'
+            Image:
+                source: 'logo.png'
+                size_hint: (1, 0.7)
             Button:
-                id: down_button
-                text: 'v'
-                size_hint_x: 0.3
-                on_press: root.decrease_number()
+                text: 'Start'
+                size_hint: (1, 0.3)
+                background_normal: ''
+                background_color: (0.1, 1, 0.1, 0.5)
+                on_press: root.current = 'startgame'
+
+    StartGameScreen:
+        id: 'startgame'
+        name: 'startgame'
+        BoxLayout:
+            orientation: 'vertical'
             Label:
-                id: 'num_players_label'
-                text: str(root.playernum)
-                size_hint_x: 0.4
+                id: 'choose_players_label'
+                text: 'Choose the number of players:'
+                font_size: 30
+                size_hint: 1,0.4
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint: 1,0.3
+                Button:
+                    id: down_button
+                    text: 'v'
+                    size_hint_x: 0.3
+                    on_press: app.decrease_number()
+                Label:
+                    id: 'num_players_label'
+                    text: str(app.playernum)
+                    size_hint_x: 0.4
+                Button:
+                    id: up_button
+                    text: '^'
+                    size_hint_x: 0.3
+                    on_press: app.increase_number()
             Button:
-                id: up_button
-                text: '^'
-                size_hint_x: 0.3
-                on_press: root.increase_number()
-        Button:
-            text: 'GO'
-            background_normal: ''
-            background_color: (0.1, 1, 0.1, 0.5)
-            size_hint: 1,0.3
-            on_press: root.init_table()
+                text: 'GO'
+                background_normal: ''
+                background_color: (0.1, 1, 0.1, 0.5)
+                size_hint: 1,0.3
+                on_press: app.init_table(); root.current = f"player{app.playernum}"
 
 
-<PlayerScreen>:
-    BoxLayout:
-        Button:
-            text: 'My settings button'
-        Button:
-            text: 'Back to menu'
-            on_press: root.manager.current = 'splash'
+    PlayerScreen:
+        id: 'playerscreen'
+        BoxLayout:
+            Button:
+                text: 'My settings button'
+            Button:
+                text: 'Back to menu'
+                on_press: root.current = 'splash'

@@ -6,9 +6,8 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.properties import ObjectProperty, StringProperty
 
-Builder.load_file('controller.kv')
-
 #move = Move()
+Builder.load_file('controller.kv')
 
 # ---- Game: ----
 while True:
@@ -212,25 +211,6 @@ class SplashScreen(Screen):
 
 class StartGameScreen(Screen):
     # This screen should set number of players
-
-    playernum = ObjectProperty(defaultvalue=1)
-    up_button = ObjectProperty()
-    down_button = ObjectProperty()
-
-    def decrease_number(self):
-        if self.playernum > 1:
-            self.playernum -= 1
-
-    def increase_number(self):
-        if self.playernum < 3:
-            self.playernum += 1
-
-            # Get the number of players for the game
-            #num_of_players = int(input("How many players?? "))
-
-            # Initialize our table
-            #the_table = Table(num_of_players)
-
     pass
 
 
@@ -244,24 +224,34 @@ class EndGameScreen(Screen):
     pass
 
 
+class ScreenManager(ScreenManager):
+    pass
+
+
 class TestApp(App):
     # Bundling everything together
+    playernum = ObjectProperty(defaultvalue=1)
 
     def build(self):
         # Print an opening statement
         print("Play a game of Blackjack!!")
         # Create the screen manager
         self.sm = ScreenManager(transition=NoTransition())
-        self.sm.add_widget(SplashScreen(name='splash'))
-        self.sm.add_widget(StartGameScreen(name='startgame'))
-
-        # for each player, add a playerscreen of name=f"player{playernum}"
 
         return self.sm
 
+    def decrease_number(self):
+        if self.playernum > 1:
+            self.playernum -= 1
+
+    def increase_number(self):
+        if self.playernum < 3:
+            self.playernum += 1
+
     def init_table(self):
-        startscreen = self.sm.get_screen('startgame')
-        print(startscreen.playernum)
+        self.the_table = Table(self.playernum)
+        for i in range(self.playernum):
+            self.sm.add_widget(PlayerScreen(name=f"player{i+1}"))
 
 
 if __name__ == '__main__':
