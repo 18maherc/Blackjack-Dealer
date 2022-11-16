@@ -15,7 +15,7 @@ def getCard():
 
     stop_camera = 0
     detect = Detector()
-    detect.loadCards()
+    # detect.loadCards()
 
     img = camStream.read()
 
@@ -38,6 +38,7 @@ def getCard():
     else:
         cardIdentity = detect.checkCard(array1, medCA, medCP)
 
+    print("the card identified is: ", cardIdentity.to_string())
     cv2.destroyAllWindows()
     camStream.stop()
     return cardIdentity
