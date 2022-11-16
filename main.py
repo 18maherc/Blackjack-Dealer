@@ -1,25 +1,34 @@
-from kivy.properties import ObjectProperty, StringProperty
 from kivy.app import App
-from kivy.uix.floatlayout import FloatLayout
-import kivy
-kivy.require('1.0.5')
+from kivy.lang import Builder
+from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
+
+Builder.load_file('controller.kv')
+
+# Declare both screens
 
 
-class Controller(FloatLayout):
-    '''Create a controller that receives a custom widget from the kv lang file.
-
-    Add an action to be called from the kv lang file.
-    '''
-
-    def button_pressed(self):
-        self.button_wid.text = 'Hello, World!'
+class SplashScreen(Screen):
+    pass
 
 
-class ControllerApp(App):
+class SettingsScreen(Screen):
+    pass
+
+
+class TestApp(App):
 
     def build(self):
-        return Controller()
+        # Print an opening statement
+        print("Play a game of Blackjack!!")
+        # Create the screen manager
+        sm = ScreenManager(transition=NoTransition())
+        sm.add_widget(SplashScreen(name='splash'))
+        sm.add_widget(SettingsScreen(name='settings'))
+
+        # for each player, add a playerscreen of name=f"player{playernum}"
+
+        return sm
 
 
 if __name__ == '__main__':
-    ControllerApp().run()
+    TestApp().run()

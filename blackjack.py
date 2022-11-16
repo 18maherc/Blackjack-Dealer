@@ -1,25 +1,21 @@
 from game_objects import *
 from game_functions import *
 from communication import Move
+from kivy.app import App
+from kivy.lang import Builder
+from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
+from kivy.properties import ObjectProperty, StringProperty
 
-move = Move()
+Builder.load_file('controller.kv')
+
+#move = Move()
 
 # ---- Game: ----
 while True:
-    # Print an opening statement
-    print("Play a game of Blackjack!!")
+    # TODO: Display a splash screen with a start button
 
-    # Get the number of players for the game
-    while True:
-        try:
-            num_of_players = int(input("How many players?? "))
-            break
-        except ValueError:
-            print("You must enter an integer")
-            continue
-
-    # Initialize our table
-    the_table = Table(num_of_players)
+    # TODO: Display a player number selection screen
+    break
 
     # Play the game
     while True:
@@ -202,6 +198,71 @@ while True:
     # TODO: Handle removal/addition of players frorm the table
     # (Will require adjusting base coords)
 
-    close_game = input("Would you like to close the game? (y/n) ")
+    close_game = input(
+        "Would you like to close the game (otherwise resets table)? (y/n) ")
     if close_game[0].lower() == 'y':
         break
+
+
+# Declare all screens
+class SplashScreen(Screen):
+    # Intro screen with logo and start button
+    pass
+
+
+class StartGameScreen(Screen):
+    # This screen should set number of players
+
+    playernum = ObjectProperty(defaultvalue=1)
+    up_button = ObjectProperty()
+    down_button = ObjectProperty()
+
+    def decrease_number(self):
+        if self.playernum > 1:
+            self.playernum -= 1
+
+    def increase_number(self):
+        if self.playernum < 3:
+            self.playernum += 1
+
+            # Get the number of players for the game
+            #num_of_players = int(input("How many players?? "))
+
+            # Initialize our table
+            #the_table = Table(num_of_players)
+
+    pass
+
+
+class PlayerScreen(Screen):
+    # Each player will have their own instance of this
+    pass
+
+
+class EndGameScreen(Screen):
+    # This screen is to
+    pass
+
+
+class TestApp(App):
+    # Bundling everything together
+
+    def build(self):
+        # Print an opening statement
+        print("Play a game of Blackjack!!")
+        # Create the screen manager
+        self.sm = ScreenManager(transition=NoTransition())
+        self.sm.add_widget(SplashScreen(name='splash'))
+        self.sm.add_widget(StartGameScreen(name='startgame'))
+
+        # for each player, add a playerscreen of name=f"player{playernum}"
+
+        return self.sm
+
+    def init_table(self):
+        startscreen = self.sm.get_screen('startgame')
+        print(startscreen.playernum)
+
+
+if __name__ == '__main__':
+    TestApp().run()

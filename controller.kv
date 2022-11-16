@@ -1,13 +1,56 @@
 #:kivy 1.0
 
-:
-    button_wid: custom_button
-
+<SplashScreen>:
     BoxLayout:
         orientation: 'vertical'
-        padding: 20
-
+        Image:
+            source: 'logo.png'
+            size_hint: (1, 0.7)
         Button:
-            id: custom_button
-            text: 'Hello, World?'
-            on_press: root.button_pressed()
+            text: 'Start'
+            size_hint: (1, 0.3)
+            background_normal: ''
+            background_color: (0.1, 1, 0.1, 0.5)
+            on_press: root.manager.current = 'startgame'
+
+<StartGameScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            id: 'choose_players_label'
+            text: 'Choose the number of players:'
+            size: self.texture_size
+            font_size: 30
+            size_hint: 1,0.4
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1,0.3
+            Button:
+                id: down_button
+                text: 'v'
+                size_hint_x: 0.3
+                on_press: root.decrease_number()
+            Label:
+                id: 'num_players_label'
+                text: str(root.playernum)
+                size_hint_x: 0.4
+            Button:
+                id: up_button
+                text: '^'
+                size_hint_x: 0.3
+                on_press: root.increase_number()
+        Button:
+            text: 'GO'
+            background_normal: ''
+            background_color: (0.1, 1, 0.1, 0.5)
+            size_hint: 1,0.3
+            on_press: root.init_table()
+
+
+<PlayerScreen>:
+    BoxLayout:
+        Button:
+            text: 'My settings button'
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'splash'
