@@ -12,36 +12,42 @@ def getCard():
 
     camStream = VideoStream((600, 700), 10).start()
     time.sleep(1)  # Give the camera time to warm up
+    while True:
 
-    stop_camera = 0
-    detect = Detector()
-    # detect.loadCards()
+        stop_camera = 0
+        detect = Detector()
+        # detect.loadCards()
 
-    img = camStream.read()
+        img = camStream.read()
 
-    cv2.imshow("Image from Camera", img)
-    cv2.imwrite("ReceivedImage.png", img)
+        cv2.imshow("Image from Camera", img)
+        cv2.imwrite("ReceivedImage.png", img)
 
-    thresh = detect.editCard(img)
+        thresh = detect.editCard(img)
 
-    array1, array2, array3, aceArray, medCA, medCP, contours = detect.getContours(
-        thresh, img)
+        array1, array2, array3, aceArray, medCA, medCP, contours = detect.getContours(
+            thresh, img)
 
-    #cv2.imshow("Suit Pulled", suitSent)
-    #cv2.imshow("Value pulled", valueSent)
+        #cv2.imshow("Suit Pulled", suitSent)
+        #cv2.imshow("Value pulled", valueSent)
+        if len(aceArray) == 0 and len(array1) == 0 and len(array2) == 0:
+            cardIdentity = Card('Joker', 'Joker')
+        elif len(aceArray) == 1 and len(array1) == 0:
+            cardIdentity = Card('Spades', 'Ace')
+        elif len(array2) > 0:
+            cardIdentity = detect.findFaceCardTest(img, contours)
+            #cardIdentity = detect.findFaceCard(img,array2,array3)
+        else:
+            cardIdentity = detect.checkCard(array1, medCA, medCP)
 
-    if len(aceArray) == 1 and len(array1) == 0:
-        cardIdentity = Card('Spades', 'Ace')
-    elif len(array2) > 0:
-        cardIdentity = detect.findFaceCardTest(img, contours)
-        #cardIdentity = detect.findFaceCard(img,array2,array3)
-    else:
-        cardIdentity = detect.checkCard(array1, medCA, medCP)
-
-    print("the card identified is: ", cardIdentity.to_string())
-    cv2.destroyAllWindows()
-    camStream.stop()
-    return cardIdentity
+        print("the card identified is: ", cardIdentity.to_string())
+        cv2.destroyAllWindows()
+        camStream.stop()
+        if cardIdentity.value == 'Joker':
+            time.sleep(1)  # Give the camera time to warm up
+            continue
+        else:
+            return cardIdentity
 
     # cardIdentity = detect.checkCard(array1,array2,array3, suitSent,valueSent,medCA,medCP)
 

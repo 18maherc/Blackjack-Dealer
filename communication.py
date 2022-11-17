@@ -16,7 +16,7 @@ class Move():
         self.s.flushInput()  # Flush startup text in serial input
 
     def draw(self, c):
-        zoff = -4.3 - (2.3*c/52)
+        zoff = -4.3 - (2.35*c/52)
         zoff = round(zoff, 2)
         f = ["G1X125Y0Z0F5000", "G04P0", "S1000M03", "G04P0", f"G1X125Y0Z{zoff}F100", "G04P0", "G04P2", "G04P0",
              "G1X125Y0Z0F200", "G04P0", "G1X0Y0Z0F5000", "G04P0", "G1X0Y0Z-4.5F200", "G04P0", "M05", "G04P0", "G04P2", "G04P0"]
@@ -35,8 +35,8 @@ class Move():
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
     def place(self, coord2, coord1=[0, 0], dealer=False, frate=5000):
-        f = [f"G01X{coord1[0]}Y{coord1[1]}Z0F{frate}\n", "M03\n",
-             f"G1X{coord1[0]}Y{coord1[1]}Z-6.6F100\n", "G04P2\n", f"G01X{coord1[0]}Y{coord1[1]}Z0F{200}\n"]
+        f = [f"G01X{coord1[0]}Y{coord1[1]}Z0F{frate}\n", "G04P0", "M03\n", "G04P0",
+             f"G1X{coord1[0]}Y{coord1[1]}Z-6.65F100\n", "G04P0", "G04P2\n", "G04P0", f"G01X{coord1[0]}Y{coord1[1]}Z0F{200}\n", "G04P0"]
 #         if dealer:
 #             f = ["G1X0Y0Z0F5000\n", "M03\n",
 #                  "G1X0Y0Z-7.0F100\n", "G04P2\n", "G1X0Y0Z0F200\n"]
@@ -64,7 +64,7 @@ class Move():
     # c is a stack of every location a card has been placed; each entry contains a list [x,y]
     def discard(self, stack, frate=5000):
         for c in stack:
-            f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}\n", "S1000M03\n", f"G01X{c[0]}Y{c[1]}Z-6.6F100\n",
+            f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}\n", "S1000M03\n", f"G01X{c[0]}Y{c[1]}Z-6.65F100\n",
                  "G04P2\n", f"G01X{c[0]}Y{c[1]}Z0F{frate}\n", "G1X250Y0Z0\n", "M05\n", "G04P2\n", f"G01X0Y0Z0F{frate}"]
 #             von = "S1000M03\n"
 #             d1 = f"G01X{c[0]}Y{c[1]}Z-7.0F100\nG04P2\n"

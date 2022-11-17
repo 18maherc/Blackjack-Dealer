@@ -141,7 +141,8 @@ class Detector:
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (3, 3), 0)
 
-        thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 205, 1)
+        thresh = cv2.adaptiveThreshold(
+            blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 205, 1)
         cv2.imshow("Binary", thresh)
 
         return thresh
@@ -167,7 +168,7 @@ class Detector:
         arrayAceOfSpades = []
 
         for c in contours:
-            if (cv2.contourArea(c) > 2100 and cv2.contourArea(c) < 2450 and cv2.arcLength(c, True) > 250 and cv2.arcLength(c, True) < 280) or (cv2.contourArea(c) > 2285 and cv2.contourArea(c) < 2550 and cv2.arcLength(c, True) > 200 and cv2.arcLength(c, True) < 230) or (cv2.contourArea(c) > 1640 and cv2.contourArea(c) < 1775 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 195) or (cv2.contourArea(c) > 2375 and cv2.contourArea(c) < 2575 and cv2.arcLength(c, True) > 295 and cv2.arcLength(c, True) < 325):
+            if (cv2.contourArea(c) > 2100 and cv2.contourArea(c) < 2475 and cv2.arcLength(c, True) > 253 and cv2.arcLength(c, True) < 280) or (cv2.contourArea(c) > 2250 and cv2.contourArea(c) < 2575 and cv2.arcLength(c, True) > 200 and cv2.arcLength(c, True) < 230) or (cv2.contourArea(c) > 1610 and cv2.contourArea(c) < 1800 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 195) or (cv2.contourArea(c) > 2325 and cv2.contourArea(c) < 2625 and cv2.arcLength(c, True) > 290 and cv2.arcLength(c, True) < 330):
                 area = cv2.contourArea(c)
                 p = cv2.arcLength(c, True)
                 print(area, p)
@@ -175,9 +176,11 @@ class Detector:
                 filteredContours.append(cv2.arcLength(c, True))
                 filteredAreas.append(cv2.contourArea(c))
         for c in contours:
-            if cv2.contourArea(c) < 400 or cv2.contourArea(c) < 10000 or cv2.arcLength(c, True) > 1000 or cv2.arcLength(c, True) > 625:
-                continue
-            arrayAceOfSpades.append(c)
+            if (cv2.contourArea(c) > 9000 and cv2.contourArea(c) < 11000 and cv2.arcLength(c, True) > 450 and cv2.arcLength(c, True) < 550):
+                # continue
+                arrayAceOfSpades.append(c)
+                print(cv2.contourArea(c))
+                print(cv2.arcLength(c, True))
 
 #         objectsTest = np.zeros([img.shape[0],img.shape[1],3], 'uint8')
 #         for c in initFiltered:
