@@ -49,14 +49,29 @@
                 background_normal: ''
                 background_color: (0.1, 1, 0.1, 0.5)
                 size_hint: 1,0.3
-                on_press: app.init_table(); root.current = f"player{app.playernum}"
+                on_press: app.init_table(); root.current = 'player1'
 
 
-    PlayerScreen:
-        id: 'playerscreen'
+<PlayerScreen>:
+    id: 'playerscreen'
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            Label:
+                text: root.name
+            Label:
+                id: 'playermoneylabel'
+                text: f"Credits: {root.player_num}"
+            Label:
+                id: 'playerwagerlabel'
+                text: f"Wager: {root.player_num}"
+        BoxLayout:
         BoxLayout:
             Button:
-                text: 'My settings button'
+                text: 'Prev player'
+                on_press: root.manager.current = f'player{root.player_num-1}'
             Button:
-                text: 'Back to menu'
-                on_press: root.current = 'splash'
+                text: 'next player'
+                on_press: root.manager.current = f'player{root.player_num+1}'
+            

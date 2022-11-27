@@ -4,7 +4,7 @@ from communication import Move
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
-from kivy.properties import ObjectProperty, StringProperty
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 
 #move = Move()
 Builder.load_file('controller.kv')
@@ -18,9 +18,6 @@ while True:
 
     # Play the game
     while True:
-        the_dealer = the_table.dealer
-        the_players = the_table.players
-        dealer_hand = the_dealer.hand
 
         # Take bets for all players
         for playernum in range(len(the_players)):
@@ -216,6 +213,7 @@ class StartGameScreen(Screen):
 
 class PlayerScreen(Screen):
     # Each player will have their own instance of this
+    player_num = NumericProperty(defaultvalue=1)
     pass
 
 
@@ -230,7 +228,7 @@ class ScreenManager(ScreenManager):
 
 class TestApp(App):
     # Bundling everything together
-    playernum = ObjectProperty(defaultvalue=1)
+    playernum = NumericProperty(defaultvalue=1)
 
     def build(self):
         # Print an opening statement
@@ -251,7 +249,12 @@ class TestApp(App):
     def init_table(self):
         self.the_table = Table(self.playernum)
         for i in range(self.playernum):
-            self.sm.add_widget(PlayerScreen(name=f"player{i+1}"))
+            self.sm.add_widget(PlayerScreen(
+                name=f"player{i+1}", player_num=(i+1)))
+
+        self.the_dealer = self.the_table.dealer
+        self.the_players = self.the_table.players
+        self.dealer_hand = self.the_dealer.hand
 
 
 if __name__ == '__main__':
