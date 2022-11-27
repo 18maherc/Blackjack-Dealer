@@ -52,11 +52,12 @@
                 on_press: app.init_table(); root.current = 'player1'
 
 
-<PlayerScreen>:
+<Player>:
     id: 'playerscreen'
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
+            id: 'money'
             orientation: 'horizontal'
             Label:
                 text: root.name
@@ -67,6 +68,7 @@
                 id: 'playerwagerlabel'
                 text: f"Wager: {root.player_num}"
         BoxLayout:
+            id: hand_layout
         BoxLayout:
             Button:
                 text: 'Prev player'
@@ -74,4 +76,24 @@
             Button:
                 text: 'next player'
                 on_press: root.manager.current = f'player{root.player_num+1}'
+            Button:
+                text: 'Hit'
+                background_normal: ''
+                background_color: (0, 1, 0, 0.5)
+            Button:
+                text: 'Stand'
+                background_normal: ''
+                background_color: (1, 0, 0, 0.5)
+            Button:
+                text: 'Split'
+                background_normal: ''
+                background_color: (0, 0, 1, 0.5)
+            Button:
+                text: 'Double'
+                background_normal: ''
+                background_color: (0.8, 0.9, 0, 0.5)
+            Button:
+                text: 'Surrender'
+                background_normal: ''
+                background_color: (1, 0, 0.2, 0.5)
             

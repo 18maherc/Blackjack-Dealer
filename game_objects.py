@@ -1,4 +1,3 @@
-from ctypes import sizeof
 import random
 import math
 
@@ -21,6 +20,7 @@ class Card():
         self.points = points[value]
         self.coords = [250, 80]
         # ^ TODO find out coordinate stuff here ^
+        self.filename = f"{self.value}_{self.suit}.png"
 
     def to_string(self) -> str:
         return f"{self.value} of {self.suit}  ({self.points})"
