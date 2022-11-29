@@ -583,29 +583,17 @@ class TestApp(App):
                     self.show_player(num, player.hands[1])
                 else:
                     print(f"Player {num} has no hands to do action on")
+                    self.sm.current = f'player{num+1}'
             else:
                 if player.hands[0].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[0], player, move=None)
+                    self.show_player(num, player.hands[0])
                 else:
                     print(f"Player {num} has no hands to do action on")
+                    self.sm.current = f'player{num+1}'
         except Exception as e:
             print(e)
-
-    def stand(self, hand):
-        gf.stand(hand)
-
-    def split(self, num):
-        try:
-            gf.split(self.the_table.deck, self.the_players[num-1], move=None)
-        except Exception as e:
-            print(e)
-
-    def double(self, hand, player):
-        gf.double(self.the_table.deck, hand, player, move=None)
-
-    def surrender(self, hand):
-        gf.surrender(hand)
 
     def insurance(self, player):
         gf.insurance(player)
@@ -617,7 +605,7 @@ class TestApp(App):
         gf.show_dealer_hidden(hand)
 
     def show_player(self, player_num, player_hand):
-        gf.show_player(player_num, player_hand)
+        gf.show_player(player_num-1, player_hand)
 
 
 if __name__ == '__main__':
