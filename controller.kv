@@ -58,12 +58,12 @@
             orientation: 'vertical'
             BoxLayout:
                 id: players
-                size_hint_y: 0.9
+                size_hint_y: 0.8
                 orientation: 'horizontal'
             Button:
                 id: go_button
                 text: 'Submit Wagers'
-                size_hint_y: 0.1
+                size_hint_y: 0.2
                 on_press: app.init_table(); root.current = 'player1'
 
 <PlayerWager>:
@@ -71,13 +71,17 @@
         orientation: 'vertical'
         Label:
             text: f'Player {root.playernum}'
+            size_hint_y: 0.2
         Button:
             text: '^'
+            size_hint_y: 0.3
             on_press: root.wager += 1
         Label:
             text: str(root.wager)
+            size_hint_y: 0.2
         Button:
             text: 'v'
+            size_hint_y: 0.3
             on_press: root.decrease_wager()
 
 <Player>:
