@@ -15,7 +15,7 @@ class Move():
         zoff = -4.7 - (2*c/52)
         zoff = round(zoff,2)
         f = ["G1X125Y0Z0F5000", "G04P0", "S1000M03", "G04P0", f"G1X125Y0Z{zoff}F100", "G04P0", "G04P2", "G04P0",
-             "G1X125Y0Z0F200", "G04P0", "G1X0Y0Z0F5000", "G04P0", "M05", "G04P0", "G04P2", "G04P0"]
+             "G1X125Y0Z0F200", "G04P0", "G1X0Y0Z0F5000", "G04P0", "M05", "G04P0", "G04P4", "G04P0"]
         # Stream g-code to grbl
         for line in f:
             l = line.strip()  # Strip all EOL characters for consistency
@@ -63,11 +63,16 @@ class Move():
                 self.s.write(str.encode(l + '\n'))  # Send g-code block to grbl
                 grbl_out = self.s.readline()  # Wait for grbl response with carriage return
                 print(' : ' + bytes.decode(grbl_out.strip()))
-            print('Stream Complete')
+        l = "G0X0Y0Z0"
+        print('Sending: ' + l)
+        self.s.write(str.encode(l + '\n'))  # Send g-code block to grbl
+        grbl_out = self.s.readline()  # Wait for grbl response with carriage return
+        print(' : ' + bytes.decode(grbl_out.strip()))
+        print('Stream Complete')
 
     def setG(self):
         f = ["$1=255", "$100=40", "$101=40",
-             "$102=100", "$110=5000", "$111=5000", "$120=100", "$121=100", "$122=4"]
+             "$102=100", "$110=10000", "$111=10000", "$120=300", "$121=300", "$122=4"]
         # Stream g-code to grbl
         for line in f:
             l = line.strip()  # Strip all EOL characters for consistency
