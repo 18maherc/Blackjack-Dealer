@@ -1,15 +1,17 @@
-#from game_objects import *
-from game_functions import *
+# from game_objects import *
+import game_functions as gf
 from communication import Move
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.image import Image
+from kivy.uix.label import Label
+from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+import math
+import random
 
-#move = Move()
-Builder.load_file('controller.kv')
 
 # Let's give the info of the card's suits, ranks and values
 suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
@@ -18,6 +20,10 @@ values = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
 points = {'Two': 2, 'Three': 3, 'Four': 4, 'Five': 5, 'Six': 6, 'Seven': 7, 'Eight': 8, 'Nine': 9, 'Ten': 10, 'Jack': 10,
           'Queen': 10, 'King': 10, 'Ace': 11}
 card_stack = []
+
+# move = Move()
+Builder.load_file('controller.kv')
+
 
 # ---- Game: ----
 while True:
@@ -221,6 +227,11 @@ class StartGameScreen(Screen):
     pass
 
 
+class WagerScreen(Screen):
+    # This screen should set the wagers for each player before initializing them
+    pass
+
+
 class EndGameScreen(Screen):
     # This screen is to
     pass
@@ -244,6 +255,8 @@ class Card():
 
 
 class Hand(BoxLayout):
+    wager = NumericProperty(defaultvalue=1)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.length = 0
@@ -323,17 +336,22 @@ class DealerHand(BoxLayout):
 
 class Player(Screen):
     player_num = NumericProperty(defaultvalue=1)
+    wallet = NumericProperty(defaultvalue=10)
+    hands = ObjectProperty(defaultvalue=[])
+    wager = NumericProperty(defaultvalue=1)
     # Each player will have their own instance of this
 
     def __init__(self, name, player_num, **kwargs):
         super().__init__(**kwargs)
-        self.hands = []
-        self.wallet = 0
+        self.wallet = 10
+        self.wager = 1
         self.split_flag = False
         self.insurance_flag = False
-        self.base_coords = [250, 80]
         self.name = name
         self.player_num = player_num
+        self.base_coords = [250, 80+110*(self.player_num-1)]
+        self.hands = []
+        self.add_hand(Hand(wager=self.wager))
 
     def add_hand(self, hand: Hand):
         # Set the base coordinates of the new hand
@@ -347,6 +365,7 @@ class Player(Screen):
     def delete_hand(self, hand: Hand):
         for card in hand.cards:
             card_stack.remove(card.coords)
+        self.remove_widget(hand)
         self.hands.remove(hand)
 
     def split_hand(self):
@@ -407,6 +426,16 @@ class Player(Screen):
     pass
 
 
+class PlayerWager(BoxLayout):
+    playernum = NumericProperty()
+    wager = NumericProperty(defaultvalue=1)
+
+    def decrease_wager(self):
+        if self.wager > 0:
+            self.wager -= 1
+    pass
+
+
 class Dealer():
     def __init__(self, hand: DealerHand):
         hand.base_coords = [0, 165]
@@ -454,11 +483,6 @@ class Table():
         for i in range(player_count):
             new_player = Player(
                 name=f"player{i+1}", player_num=(i+1))
-            new_player.base_coords[0] = 250
-            # ^ TODO find out coordinate stuff here ^
-            new_player.base_coords[1] = 80 + 110*i
-            # ^ TODO find out coordinate stuff here ^
-            new_player.add_hand(Hand())
             self.players.append(new_player)
             screen_manager.add_widget(new_player)
 
@@ -496,11 +520,22 @@ class TestApp(App):
         if self.playernum < 3:
             self.playernum += 1
 
+    def init_wagerscreen(self):
+        for i in range(self.playernum):
+            player_layout = PlayerWager(playernum=(i+1))
+            self.sm.ids.players.add_widget(player_layout)
+
     def init_table(self):
         self.the_table = Table(self.playernum, self.sm)
 
         self.the_players = self.the_table.players
         self.the_dealer = self.the_table.dealer
+
+        # Set wagers
+        for i in range(len(self.the_players)):
+            self.the_players[i].wager = self.sm.ids.players.children[(
+                len(self.the_players)-1)-i].wager
+            self.the_players[i].remove_credits(self.the_players[i].wager)
 
         # Deal first card to every player and the dealer. Also set the wager
         for playernum in range(len(self.the_players)):
@@ -519,7 +554,7 @@ class TestApp(App):
         # Represent the physical card digitally
         self.the_dealer.hand.add_card(the_card)
         # Place the card at its physical location without flipping
-        #move.place(the_card.coords, dealer=True)
+        # move.place(the_card.coords, dealer=True)
 
         # Deal second card to every player and the dealer
         for playernum in range(len(self.the_players)):
@@ -527,10 +562,62 @@ class TestApp(App):
             the_card = self.the_table.deck.deal()
             self.the_players[playernum].hands[0].add_card(the_card)
             # move.place(the_card.coords)
+            self.show_player(playernum, self.the_players[playernum].hands[0])
         # move.draw(len(card_stack))
         self.the_table.deck.deal()
         self.the_dealer.hand.add_card(the_card)
         # move.place(the_card.coords)
+        self.show_dealer_hidden(self.the_dealer.hand)
+
+    def action(self, char, num):
+        player = self.the_players[num-1]
+        try:
+            if player.split_flag is True:
+                if player.hands[0].done_flag is not True:
+                    gf.action(char[0], self.the_table.deck,
+                              player.hands[0], player, move=None)
+                    self.show_player(num, player.hands[0])
+                elif player.hands[1].done_flag is not True:
+                    gf.action(char[0], self.the_table.deck,
+                              player.hands[1], player, move=None)
+                    self.show_player(num, player.hands[1])
+                else:
+                    print(f"Player {num} has no hands to do action on")
+            else:
+                if player.hands[0].done_flag is not True:
+                    gf.action(char[0], self.the_table.deck,
+                              player.hands[0], player, move=None)
+                else:
+                    print(f"Player {num} has no hands to do action on")
+        except Exception as e:
+            print(e)
+
+    def stand(self, hand):
+        gf.stand(hand)
+
+    def split(self, num):
+        try:
+            gf.split(self.the_table.deck, self.the_players[num-1], move=None)
+        except Exception as e:
+            print(e)
+
+    def double(self, hand, player):
+        gf.double(self.the_table.deck, hand, player, move=None)
+
+    def surrender(self, hand):
+        gf.surrender(hand)
+
+    def insurance(self, player):
+        gf.insurance(player)
+
+    def show_dealer(self, hand):
+        gf.show_dealer(hand)
+
+    def show_dealer_hidden(self, hand):
+        gf.show_dealer_hidden(hand)
+
+    def show_player(self, player_num, player_hand):
+        gf.show_player(player_num, player_hand)
 
 
 if __name__ == '__main__':

@@ -5,9 +5,8 @@ from communication import Move
 # ---- Game Functions: ----
 
 # function prompting the Player to Hit or Stand
-def action(deck: Deck, hand: Hand, player: Player, move: Move):
+def action(x: str, deck: Deck, hand: Hand, player: Player, move: Move):
     while True:
-        x = input("Hit(h) Stand(s) Split(p) Double(d) Surrender(l)? ")
         try:
             if x[0].lower() == 'h':
                 hit(deck, hand, move)
@@ -27,10 +26,10 @@ def action(deck: Deck, hand: Hand, player: Player, move: Move):
 
 
 def hit(deck: Deck, hand: Hand, move: Move):
-    move.draw(len(card_stack))
+    # move.draw(len(card_stack))
     # TODO: read physical card in
     hand.add_card(deck.deal())
-    move.place(hand.cards[-1].coords)
+    # move.place(hand.cards[-1].coords)
 
 
 def stand(hand: Hand):

@@ -3,7 +3,7 @@
 <ScreenManager>:
     playernum: int(1)
     SplashScreen:
-        id: 'splashscreen'
+        id: splashscreen
         name: 'splashscreen'
         BoxLayout:
             orientation: 'vertical'
@@ -18,12 +18,12 @@
                 on_press: root.current = 'startgame'
 
     StartGameScreen:
-        id: 'startgame'
+        id: startgame
         name: 'startgame'
         BoxLayout:
             orientation: 'vertical'
             Label:
-                id: 'choose_players_label'
+                id: choose_players_label
                 text: 'Choose the number of players:'
                 font_size: 30
                 size_hint: 1,0.4
@@ -36,7 +36,7 @@
                     size_hint_x: 0.3
                     on_press: app.decrease_number()
                 Label:
-                    id: 'num_players_label'
+                    id: num_players_label
                     text: str(app.playernum)
                     size_hint_x: 0.4
                 Button:
@@ -49,24 +49,52 @@
                 background_normal: ''
                 background_color: (0.1, 1, 0.1, 0.5)
                 size_hint: 1,0.3
+                on_press: app.init_wagerscreen(); root.current = 'wagerscreen'
+    
+    WagerScreen:
+        id: wagerscreen
+        name: 'wagerscreen'
+        BoxLayout:
+            orientation: 'vertical'
+            BoxLayout:
+                id: players
+                size_hint_y: 0.9
+                orientation: 'horizontal'
+            Button:
+                id: go_button
+                text: 'Submit Wagers'
+                size_hint_y: 0.1
                 on_press: app.init_table(); root.current = 'player1'
 
+<PlayerWager>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: f'Player {root.playernum}'
+        Button:
+            text: '^'
+            on_press: root.wager += 1
+        Label:
+            text: str(root.wager)
+        Button:
+            text: 'v'
+            on_press: root.decrease_wager()
 
 <Player>:
-    id: 'playerscreen'
+    id: playerscreen
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
-            id: 'money'
+            id: money
             orientation: 'horizontal'
             Label:
-                text: root.name
+                text: f"Player {root.player_num}"
             Label:
-                id: 'playermoneylabel'
-                text: f"Credits: {root.player_num}"
+                id: playermoneylabel
+                text: f"Credits: {root.wallet}"
             Label:
-                id: 'playerwagerlabel'
-                text: f"Wager: {root.player_num}"
+                id: playerwagerlabel
+                text: f"Wager: {root.wager}"
         BoxLayout:
             id: hand_layout
         BoxLayout:
@@ -79,21 +107,26 @@
             Button:
                 text: 'Hit'
                 background_normal: ''
-                background_color: (0, 1, 0, 0.5)
+                background_color: (0, 1, 0, 0.8)
+                on_press: app.action('h', root.player_num)
             Button:
                 text: 'Stand'
                 background_normal: ''
-                background_color: (1, 0, 0, 0.5)
+                background_color: (1, 0, 0, 0.8)
+                on_press: app.action('s', root.player_num)
             Button:
                 text: 'Split'
                 background_normal: ''
-                background_color: (0, 0, 1, 0.5)
+                background_color: (0, 0, 1, 0.8)
+                on_press: app.action('p', root.player_num)
             Button:
                 text: 'Double'
                 background_normal: ''
-                background_color: (0.8, 0.9, 0, 0.5)
+                background_color: (0.9, 0.7, 0.3, 1)
+                on_press: app.action('d', root.player_num)
             Button:
                 text: 'Surrender'
                 background_normal: ''
-                background_color: (1, 0, 0.2, 0.5)
+                background_color: (0.7, 0.05, 0.2, 1)
+                on_press: app.action('l', root.player_num)
             
