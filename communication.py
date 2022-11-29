@@ -4,7 +4,7 @@ import time
 
 class Move():
     def __init__(self):
-        # Open grbl serial port, 'COM13' will need replaced with the corresponding RPi port
+        # Open grbl serial port, 'COM13' will need replaced with the corresponding RPi port`
         self.s = serial.Serial('COM3', 115200)
         # Wake up grbl
         self.s.write(str.encode('\r\n\r\n'))
@@ -12,7 +12,7 @@ class Move():
         self.s.flushInput()  # Flush startup text in serial input
 
     def draw(self, c):
-        zoff = -4.5 - (2.5*c/52)
+        zoff = -4.7 - (2*c/52)
         zoff = round(zoff,2)
         f = ["G1X125Y0Z0F5000", "G04P0", "S1000M03", "G04P0", f"G1X125Y0Z{zoff}F100", "G04P0", "G04P2", "G04P0",
              "G1X125Y0Z0F200", "G04P0", "G1X0Y0Z0F5000", "G04P0", "M05", "G04P0", "G04P2", "G04P0"]
@@ -31,13 +31,13 @@ class Move():
     # frate = feedrate, speed at which the move is executed
     def place(self, coord2, coord1=[0, 0], dealer=False, frate=5000):
         f = [f"G01X{coord1[0]}Y{coord1[1]}Z0F{frate}", "M03",
-             f"G1X{coord1[0]}Y{coord1[1]}Z-7.0F100", "G04P2", f"G01X{coord1[0]}Y{coord1[1]}Z0F200"]
+             f"G1X{coord1[0]}Y{coord1[1]}Z-6.7F100", "G04P2", f"G01X{coord1[0]}Y{coord1[1]}Z0F200"]
 #         if dealer:
 #             f = ["G1X0Y0Z0F5000", "M03",
-#                  "G1X0Y0Z-7.0F100", "G04P2", "G1X0Y0Z0F200"]
+#                  "G1X0Y0Z-6.7F100", "G04P2", "G1X0Y0Z0F200"]
 #         else:
 #             f = ["G1X0Y0Z0F5000", "M03",
-#                  "G1X0Y0Z-7.0F100", "G04P2", "G1X0Y0Z0F200"]
+#                  "G1X0Y0Z-6.7F100", "G04P2", "G1X0Y0Z0F200"]
 # #             f = ["flip", "unflip", "flipped", "M03",
 # #                  "flipped + z", "G04P2", "flipped"]
         d = [f"G01X{coord2[0]}Y{coord2[1]}Z0F{frate}", "M05", "G04P2", "G1X125Y0Z0F5000"]
@@ -56,7 +56,7 @@ class Move():
     # c is a stack of every location a card has been placed; each entry contains a list [x,y]
     def discard(self, stack, frate=5000):
         for c in stack:
-            f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}","S1000M03",f"G01X{c[0]}Y{c[1]}Z-7.0F100\n","G04P2",f"G01X{c[0]}Y{c[1]}Z0F200","G1X250Y0Z0\n","M05","G04P2"]
+            f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}","S1000M03",f"G01X{c[0]}Y{c[1]}Z-6.7F100\n","G04P2",f"G01X{c[0]}Y{c[1]}Z0F200","G1X250Y0Z0\n","M05","G04P2"]
             for line in f:
                 l = line.strip()  # Strip all EOL characters for consistency
                 print('Sending: ' + l)
