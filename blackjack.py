@@ -1,7 +1,9 @@
+import math
+import random
 # from game_objects import *
 import game_functions as gf
 from communication import Move
-from mainDetector import getCard
+# from mainDetector import getCard
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
@@ -10,8 +12,8 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty
-import math
-import random
+from kivy.config import Config
+Config.set('graphics', 'fullscreen', 1)
 
 
 # Let's give the info of the card's suits, ranks and values
