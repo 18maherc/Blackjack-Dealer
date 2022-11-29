@@ -168,7 +168,7 @@ class Detector:
         arrayAceOfSpades = []
 
         for c in contours:
-            if (cv2.contourArea(c) > 2100 and cv2.contourArea(c) < 2475 and cv2.arcLength(c, True) > 253 and cv2.arcLength(c, True) < 280) or (cv2.contourArea(c) > 2250 and cv2.contourArea(c) < 2575 and cv2.arcLength(c, True) > 200 and cv2.arcLength(c, True) < 230) or (cv2.contourArea(c) > 1610 and cv2.contourArea(c) < 1800 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 195) or (cv2.contourArea(c) > 2325 and cv2.contourArea(c) < 2625 and cv2.arcLength(c, True) > 290 and cv2.arcLength(c, True) < 330):
+            if (cv2.contourArea(c) > 2100 and cv2.contourArea(c) < 2475 and cv2.arcLength(c, True) > 253 and cv2.arcLength(c, True) < 280) or (cv2.contourArea(c) > 2250 and cv2.contourArea(c) < 2575 and cv2.arcLength(c, True) > 200 and cv2.arcLength(c, True) < 230) or (cv2.contourArea(c) > 1610 and cv2.contourArea(c) < 1800 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 195) or (cv2.contourArea(c) > 2325 and cv2.contourArea(c) < 2625 and cv2.arcLength(c, True) > 290 and cv2.arcLength(c, True) < 320):
                 area = cv2.contourArea(c)
                 p = cv2.arcLength(c, True)
                 print(area, p)
@@ -281,7 +281,9 @@ class Detector:
                 minDiff = q
         print("Length of Contours ", len(filtered))
         print("Check for Value")
-        if (len(filtered) > 0):
+        if (len(filtered) > 10):
+            valueIndex = 9
+        elif (len(filtered) > 0):
             valueIndex = len(filtered)-1
         else:
             valueIndex = 0
