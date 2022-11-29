@@ -29,7 +29,7 @@ class Move():
     # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
-    def place(self, coord2, coord1=[0, 0], dealer=False, frate=5000):
+    def place(self, coord2, coord1=[0, 0], dealer=False, frate=10000):
         f = [f"G01X{coord1[0]}Y{coord1[1]}Z0F{frate}", "M03",
              f"G1X{coord1[0]}Y{coord1[1]}Z-6.7F100", "G04P2", f"G01X{coord1[0]}Y{coord1[1]}Z0F200"]
 #         if dealer:
@@ -54,7 +54,7 @@ class Move():
 
     # s is the serial variable
     # c is a stack of every location a card has been placed; each entry contains a list [x,y]
-    def discard(self, stack, frate=5000):
+    def discard(self, stack, frate=10000):
         for c in stack:
             f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}","S1000M03",f"G01X{c[0]}Y{c[1]}Z-6.7F100\n","G04P2",f"G01X{c[0]}Y{c[1]}Z0F200","G1X250Y0Z0\n","M05","G04P2"]
             for line in f:
