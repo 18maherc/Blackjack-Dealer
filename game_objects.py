@@ -1,7 +1,7 @@
 import random
 import math
 
-# TODO: clear all TODOs
+# TODO: clear all TODOss
 
 # Let's give the info of the card's suits, ranks and values
 suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')

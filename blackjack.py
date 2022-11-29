@@ -1,6 +1,7 @@
 # from game_objects import *
 import game_functions as gf
 from communication import Move
+from mainDetector import getCard
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
@@ -79,7 +80,7 @@ while True:
             # Draw a physical card
             move.draw(len(card_stack))
             # TODO: Read the physical card in
-            the_card = the_table.deck.deal()
+            the_card = getCard()
             # Represent the physical card digitally
             the_players[playernum].hands[0].add_card(the_card)
             # Place the card at its physical location after flipping
@@ -87,7 +88,7 @@ while True:
         # Draw a physical card
         move.draw(len(card_stack))
         # TODO: Read the physical card in
-        the_card = the_table.deck.deal()
+        the_card = getCard()
         # Represent the physical card digitally
         the_dealer.hand.add_card(the_card)
         # Place the card at its physical location without flipping
@@ -96,11 +97,11 @@ while True:
         # Deal second card to every player and the dealer
         for playernum in range(len(the_players)):
             move.draw(len(card_stack))
-            the_card = the_table.deck.deal()
+            the_card = getCard()
             the_players[playernum].hands[0].add_card(the_card)
             move.place(the_card.coords)
         move.draw(len(card_stack))
-        the_table.deck.deal()
+        the_card = getCard()
         the_dealer.hand.add_card(the_card)
         move.place(the_card.coords)
 
