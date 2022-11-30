@@ -1,15 +1,14 @@
-from ctypes import sizeof
 import random
 import math
 
-# TODO: clear all TODOs
+# TODO: clear all TODOss
 
 # Let's give the info of the card's suits, ranks and values
-suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
+suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs', 'Joker')
 values = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
-          'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace')
+          'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace', 'Joker')
 points = {'Two': 2, 'Three': 3, 'Four': 4, 'Five': 5, 'Six': 6, 'Seven': 7, 'Eight': 8, 'Nine': 9, 'Ten': 10, 'Jack': 10,
-          'Queen': 10, 'King': 10, 'Ace': 11}
+          'Queen': 10, 'King': 10, 'Ace': 11, 'Joker': 69}
 card_stack = []
 
 
@@ -21,6 +20,7 @@ class Card():
         self.points = points[value]
         self.coords = [250, 80]
         # ^ TODO find out coordinate stuff here ^
+        self.filename = f"{self.value}_{self.suit}.png"
 
     def to_string(self) -> str:
         return f"{self.value} of {self.suit}  ({self.points})"

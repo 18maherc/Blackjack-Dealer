@@ -1,0 +1,165 @@
+#:kivy 1.0
+
+<ScreenManager>:
+    playernum: int(1)
+    SplashScreen:
+        id: splashscreen
+        name: 'splashscreen'
+        BoxLayout:
+            orientation: 'vertical'
+            Image:
+                source: 'logo.png'
+                size_hint: (1, 0.7)
+            Button:
+                text: 'Start'
+                size_hint: (1, 0.3)
+                background_normal: ''
+                background_color: (0.1, 1, 0.1, 0.5)
+                on_press: root.current = 'startgame'
+
+    StartGameScreen:
+        id: startgame
+        name: 'startgame'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                id: choose_players_label
+                text: 'Choose the number of players:'
+                font_size: 30
+                size_hint: 1,0.4
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint: 1,0.3
+                Button:
+                    id: down_button
+                    text: 'v'
+                    size_hint_x: 0.3
+                    on_press: app.decrease_number()
+                Label:
+                    id: num_players_label
+                    text: str(app.playernum)
+                    size_hint_x: 0.4
+                Button:
+                    id: up_button
+                    text: '^'
+                    size_hint_x: 0.3
+                    on_press: app.increase_number()
+            Button:
+                text: 'GO'
+                background_normal: ''
+                background_color: (0.1, 1, 0.1, 0.5)
+                size_hint: 1,0.3
+                on_press: app.init_wagerscreen(); root.current = 'wagerscreen'
+    
+    WagerScreen:
+        id: wagerscreen
+        name: 'wagerscreen'
+        BoxLayout:
+            orientation: 'vertical'
+            BoxLayout:
+                id: players
+                size_hint_y: 0.8
+                orientation: 'horizontal'
+            Button:
+                id: go_button
+                text: 'Submit Wagers'
+                size_hint_y: 0.2
+                on_press: app.init_table(); root.current = 'player1'
+
+    EndGameScreen:
+        id: endgamescreen
+        name: 'endgamescreen'
+        BoxLayout:
+            orientation: 'vertical'
+            BoxLayout:
+                id: dealerhand
+                orientation: 'horizontal'
+                size_hint_y: 0.4
+                Label:
+                    text: 'Dealer Hand:'
+                    size_hint_x: 0.2
+            BoxLayout:
+                id: playerresults
+                orientation: 'horizontal'
+                size_hint_y: 0.4
+            Button:
+                text: 'New Game'
+                size_hint_y: 0.2
+                on_press: app.new_game(); root.current = 'wagerscreen'
+
+<PlayerWager>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: f'Player {root.playernum}'
+            size_hint_y: 0.2
+        Button:
+            text: '^'
+            size_hint_y: 0.3
+            on_press: root.wager += 1
+        Label:
+            text: str(root.wager)
+            size_hint_y: 0.2
+        Button:
+            text: 'v'
+            size_hint_y: 0.3
+            on_press: root.decrease_wager()
+
+<PlayerResult>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: f'Player {root.playernum}'
+        Label:
+            text: root.result
+
+<Player>:
+    id: playerscreen
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            id: money
+            orientation: 'horizontal'
+            Label:
+                text: f"Player {root.player_num}"
+            Label:
+                id: playermoneylabel
+                text: f"Credits: {root.wallet}"
+            Label:
+                id: playerwagerlabel
+                text: f"Wager: {root.wager}"
+        BoxLayout:
+            id: hand_layout
+        BoxLayout:
+            Button:
+                text: 'Prev player'
+                on_press: root.manager.current = f'player{root.player_num-1}'
+            Button:
+                text: 'next player'
+                on_press: root.manager.current = f'player{root.player_num+1}'
+            Button:
+                text: 'Hit'
+                background_normal: ''
+                background_color: (0, 1, 0, 0.8)
+                on_press: app.action('h', root.player_num)
+            Button:
+                text: 'Stand'
+                background_normal: ''
+                background_color: (1, 0, 0, 0.8)
+                on_press: app.action('s', root.player_num)
+            Button:
+                text: 'Split'
+                background_normal: ''
+                background_color: (0, 0, 1, 0.8)
+                on_press: app.action('p', root.player_num)
+            Button:
+                text: 'Double'
+                background_normal: ''
+                background_color: (0.9, 0.7, 0.3, 1)
+                on_press: app.action('d', root.player_num)
+            Button:
+                text: 'Surrender'
+                background_normal: ''
+                background_color: (0.7, 0.05, 0.2, 1)
+                on_press: app.action('l', root.player_num)
+            
