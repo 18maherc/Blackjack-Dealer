@@ -1,8 +1,7 @@
-from game_objects import *
+from blackjack import *
 from communication import Move
-#from mainDetector import getCard
-#move = Move()
-# TODO: ^ Uncomment these ^
+from mainDetector import getCard
+move = Move()
 
 
 # ---- Game Functions: ----
@@ -27,10 +26,9 @@ def action(x: str, deck: Deck, hand: Hand, player: Player, move: Move):
 
 
 def hit(deck: Deck, hand: Hand, move: Move):
-    # TODO: move.draw(len(card_stack))
-    # TODO: hand.add_card(getCard())
-    hand.add_card(deck.deal())
-    # TODO: move.place(hand.cards[-1].coords)
+    move.draw(len(card_stack))
+    hand.add_card(getCard())
+    move.place(hand.cards[-1].coords)
 
 
 def stand(hand: Hand):
@@ -41,8 +39,6 @@ def split(deck: Deck, player: Player, move: Move):
     player.split_hand()
     hit(deck, player.hands[0], move)
     hit(deck, player.hands[1], move)
-    # player.hands[0].add_card(deck.deal())
-    # player.hands[1].add_card(deck.deal())
 
 
 def double(deck: Deck, hand: Hand, player: Player, move: Move):
