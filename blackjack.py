@@ -257,15 +257,12 @@ class Card():
 
 
 class Hand(BoxLayout):
-    wager = NumericProperty(defaultvalue=1)
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.length = 0
         self.cards = []  # list of  cards
         self.score = 0
         self.done_flag = False
-        self.wager = 1
         self.surrender_flag = False
         self.base_coords = [250, 80]
 
@@ -349,7 +346,7 @@ class Player(Screen):
         self.player_num = player_num
         self.base_coords = [250, 80+110*(self.player_num-1)]
         self.hands = []
-        self.add_hand(Hand(wager=self.wager))
+        self.add_hand(Hand())
 
     def add_hand(self, hand: Hand):
         # Set the base coordinates of the new hand
@@ -362,7 +359,7 @@ class Player(Screen):
     def delete_hand(self, hand: Hand):
         for card in hand.cards:
             card_stack.remove(card.coords)
-        self.remove_widget(self.ids.hand_layout.children[0])
+        self.ids.hand_layout.clear_widgets(self.ids.hand_layout.children)
         self.hands.remove(hand)
 
     def split_hand(self):
@@ -372,31 +369,27 @@ class Player(Screen):
             if len(self.hands[0].cards) == 2:
                 first_card = self.hands[0].cards[0]
                 second_card = self.hands[0].cards[1]
-                hand_wager = self.hands[0].wager
                 # You can only split if the cards are equal in points (faces and 10 are equal)
                 if first_card.points == second_card.points:
                     # Get rid of the hand
                     self.delete_hand(self.hands[0])
                     # Add the money back
-                    self.add_credits(hand_wager)
+                    self.add_credits(self.wager)
 
                     # Create a new hand
                     new_hand1 = Hand()
                     # Add one of the cards to it
                     new_hand1.add_card(first_card)
-                    # Set the wager for it
-                    new_hand1.wager = hand_wager
                     # Add the hand to the player
                     self.add_hand(new_hand1)
                     # Take money for hand's wager
-                    self.remove_credits(hand_wager)
+                    self.remove_credits(self.wager)
 
                     # Repeat for the other card
                     new_hand2 = Hand()
                     new_hand2.add_card(second_card)
-                    new_hand2.wager = hand_wager
                     self.add_hand(new_hand2)
-                    self.remove_credits(hand_wager)
+                    self.remove_credits(self.wager)
 
                     # Turn on the flag for this player
                     self.split_flag = True
@@ -416,6 +409,7 @@ class Player(Screen):
 
     def clear(self):
         self.hands.clear()
+        self.ids.hand_layout.clear_widgets(self.ids.hand_layout.children)
         self.add_hand(Hand())
         self.split_flag = False
         self.insurance_flag = False
@@ -511,6 +505,8 @@ class TestApp(App):
         print("Play a game of Blackjack!!")
         # Create the screen manager
         self.sm = ScreenManager(transition=NoTransition())
+        # Initialize the table
+        self.the_table = None
 
         return self.sm
 
@@ -528,11 +524,16 @@ class TestApp(App):
             self.sm.ids.players.add_widget(player_layout)
 
     def init_table(self):
-        self.the_table = Table(self.playernum, self.sm)
+        if self.the_table is None:
+            self.the_table = Table(self.playernum, self.sm)
 
-        self.the_players = self.the_table.players
-        self.the_dealer = self.the_table.dealer
+            self.the_players = self.the_table.players
+            self.the_dealer = self.the_table.dealer
 
+        self.set_wagers()
+        self.initial_deal()
+
+    def set_wagers(self):
         # Set wagers
         for i in range(len(self.the_players)):
             set_wager = self.sm.ids.players.children[(
@@ -542,6 +543,7 @@ class TestApp(App):
             self.the_players[i].wager = set_wager
             self.the_players[i].remove_credits(self.the_players[i].wager)
 
+    def initial_deal(self):
         # Deal first card to every player and the dealer. Also set the wager
         for playernum in range(len(self.the_players)):
             # Draw a physical card
@@ -583,10 +585,12 @@ class TestApp(App):
                 if player.hands[0].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[0], player, move=None)
+                    # TODO: set move=move
                     self.show_player(num-1, player.hands[0])
                 elif player.hands[1].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[1], player, move=None)
+                    # TODO: set move=move
                     self.show_player(num-1, player.hands[1])
                     if player.hands[1].done_flag is True:
                         self.next_playerscreen(num)
@@ -600,6 +604,7 @@ class TestApp(App):
                 if player.hands[0].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[0], player, move=None)
+                    # TODO: set move=move
                     self.show_player(num-1, player.hands[0])
                     # Check if we move on following possible final action
                     if player.hands[0].done_flag is True:
@@ -640,6 +645,8 @@ class TestApp(App):
             # Use the hit function from game_functions
             gf.action('h', self.the_table.deck,
                       self.the_dealer.hand, player=None, move=None)
+            # TODO: set move=move
+
         self.show_dealer(self.the_dealer.hand)
         self.sm.ids.dealerhand.add_widget(self.the_dealer.hand)
 
@@ -649,9 +656,30 @@ class TestApp(App):
                 result = gf.calculate_winner(self.the_dealer.hand,
                                              player.hands[handnum], player)
                 print(
-                    f"Player {player.player_num+1} you now have {player.wallet} credits.")
+                    f"Player {player.player_num} you now have {player.wallet} credits.")
                 self.sm.ids.playerresults.add_widget(PlayerResult(
                     playernum=player.player_num, result=result))
+
+    def new_game(self):
+        # -- End of game sequence --
+        # Replace the dealer's hand
+        self.the_dealer.hand = DealerHand()
+        self.dealer_hand = self.the_dealer.hand
+        # Reset the players
+        for playernum in range(len(self.the_players)):
+            self.the_players[playernum].clear()
+        # Physically collect all cards
+        # TODO: move.discard(card_stack)
+        # Reset the card stack
+        card_stack = []
+        # Clear the Dealer's hand widget
+        self.sm.ids.dealerhand.clear_widgets(self.sm.ids.dealerhand.children)
+        # Add the default label back into the Dealer's hand widget
+        self.sm.ids.dealerhand.add_widget(
+            Label(text='Dealer Hand:', size_hint_x=0.2))
+        # Clear the Player results widget(s)
+        self.sm.ids.playerresults.clear_widgets(
+            self.sm.ids.playerresults.children)
 
         return  # right now this is just placeholder
 

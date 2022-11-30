@@ -1,29 +1,29 @@
 from game_objects import *
 from communication import Move
 #from mainDetector import getCard
+#move = Move()
+# TODO: ^ Uncomment these ^
 
 
 # ---- Game Functions: ----
 
 # function prompting the Player to Hit or Stand
 def action(x: str, deck: Deck, hand: Hand, player: Player, move: Move):
-    while True:
-        try:
-            if x[0].lower() == 'h':
-                hit(deck, hand, move)
-            elif x[0].lower() == 's':
-                stand(hand)
-            elif x[0].lower() == 'p' and player is not None:
-                split(deck, player, move)
-            elif x[0].lower() == 'd':
-                double(deck, hand, player, move)
-            elif x[0].lower() == 'l':
-                surrender(hand)
-            else:
-                raise Exception("Invalid action. Please try again")
-            break
-        except Exception as e:
-            print(e)
+    try:
+        if x[0].lower() == 'h':
+            hit(deck, hand, move)
+        elif x[0].lower() == 's':
+            stand(hand)
+        elif x[0].lower() == 'p' and player is not None:
+            split(deck, player, move)
+        elif x[0].lower() == 'd':
+            double(deck, hand, player, move)
+        elif x[0].lower() == 'l':
+            surrender(hand)
+        else:
+            raise Exception("Invalid action. Please try again")
+    except Exception as e:
+        print(e)
 
 
 def hit(deck: Deck, hand: Hand, move: Move):
@@ -107,21 +107,21 @@ def player_busts(player: Player) -> str:
     return 'lose'
 
 
-def player_wins(player: Player, hand: Hand) -> str:
+def player_wins(player: Player) -> str:
     print("Player wins!")
-    player.add_credits(2*hand.wager)
+    player.add_credits(2*player.wager)
     return 'win'
 
 
-def player_blackjack(player: Player, hand: Hand) -> str:
+def player_blackjack(player: Player) -> str:
     print("Player won with blackjack!")
-    player.add_credits(2.5*hand.wager)
+    player.add_credits(2.5*player.wager)
     return 'win'
 
 
-def dealer_busts(player: Player, hand: Hand) -> str:
+def dealer_busts(player: Player) -> str:
     print("Dealer busts!")
-    player.add_credits(2*hand.wager)
+    player.add_credits(2*player.wager)
     return 'win'
 
 
@@ -131,9 +131,9 @@ def dealer_wins(player: Player) -> str:
     return 'lose'
 
 
-def push(player: Player, hand: Hand) -> str:
+def push(player: Player) -> str:
     print("Dealer and Player tie! It's a push.")
-    player.add_credits(hand.wager)
+    player.add_credits(player.wager)
     return 'push'
 
 
@@ -143,33 +143,33 @@ def calculate_winner(dealer_hand: Hand, player_hand: Hand, player: Player) -> st
         if player_hand.size == 2:
             if dealer_hand.score == 21:
                 if dealer_hand.size == 2:
-                    result = push(player, player_hand)
+                    result = push(player)
                 else:
-                    result = player_blackjack(player, player_hand)
+                    result = player_blackjack(player)
             else:
-                result = player_blackjack(player, player_hand)
+                result = player_blackjack(player)
         else:
             if dealer_hand.score == 21:
                 if dealer_hand.size == 2:
                     result = dealer_wins(player)
                 else:
-                    result = push(player, player_hand)
+                    result = push(player)
             else:
-                result = player_wins(player, player_hand)
+                result = player_wins(player)
     # Player stayed under 21
     elif player_hand.score < 21:
         # Dealer goes over and Player is under
         if dealer_hand.score > 21:
-            result = dealer_busts(player, player_hand)
+            result = dealer_busts(player)
         # Dealer and Player are both under but dealer is higher
         elif dealer_hand.score > player_hand.score:
             result = dealer_wins(player)
         # Dealer and Player are both under but player is higher
         elif dealer_hand.score < player_hand.score:
-            result = player_wins(player, player_hand)
+            result = player_wins(player)
         # Dealer and Player are tied
         else:
-            result = push(player, player_hand)
+            result = push(player)
     # Player busted. A loss no matter Dealer's cards
     else:
         result = player_busts(player)
