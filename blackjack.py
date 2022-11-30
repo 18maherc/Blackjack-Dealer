@@ -681,8 +681,6 @@ class TestApp(App):
         self.sm.ids.playerresults.clear_widgets(
             self.sm.ids.playerresults.children)
 
-        return  # right now this is just placeholder
-
 
 if __name__ == '__main__':
     TestApp().run()
