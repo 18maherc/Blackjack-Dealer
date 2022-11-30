@@ -42,11 +42,12 @@ def getCard():
 
         print("the card identified is: ", cardIdentity.to_string())
         cv2.destroyAllWindows()
-        camStream.stop()
+
         if cardIdentity.value == 'Joker':
             time.sleep(1)  # Give the camera time to warm up
             continue
         else:
+            camStream.stop()
             return cardIdentity
 
     # cardIdentity = detect.checkCard(array1,array2,array3, suitSent,valueSent,medCA,medCP)

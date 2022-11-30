@@ -85,10 +85,10 @@ class Detector:
             p = cv2.arcLength(c, True)
             # print(area,p)
 
-        cv2.imshow("Contours", objectsTest)
+        # cv2.imshow("Contours", objectsTest)
         cv2.imwrite("ContoursTest.png", objectsTest)
 
-        cv2.imshow("Contours", objectsTestValue)
+        # cv2.imshow("Contours", objectsTestValue)
         cv2.imwrite("ContoursTestValue.png", objectsTestValue)
 
         faceArray = ['Jack', 'Queen', 'King']
@@ -143,7 +143,7 @@ class Detector:
 
         thresh = cv2.adaptiveThreshold(
             blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 205, 1)
-        cv2.imshow("Binary", thresh)
+        # cv2.imshow("Binary", thresh)
 
         return thresh
 
@@ -238,7 +238,7 @@ class Detector:
             print(area, p)
         print("full list")
 
-        cv2.imshow("Contours", objects)
+        # cv2.imshow("Contours", objects)
         cv2.imwrite("Contours.png", objects)
 
         # cv2.imwrite("queen.png",objectsValue)
