@@ -322,6 +322,8 @@ class DealerHand(BoxLayout):
             self.done_flag = True  # auto-stand when player hits 21
         # Add the card to the card_stack
         card_stack.insert(0, card.coords)
+        # Show the card to the dealer
+        self.add_widget(Image(source=f"card_images/{card.filename}"))
 
     def contains(self, card: Card) -> bool:
         for c in self.cards:
@@ -428,6 +430,12 @@ class PlayerWager(BoxLayout):
     def decrease_wager(self):
         if self.wager > 0:
             self.wager -= 1
+    pass
+
+
+class PlayerResult(BoxLayout):
+    playernum = NumericProperty()
+    result = ObjectProperty()
     pass
 
 
@@ -580,31 +588,27 @@ class TestApp(App):
                     gf.action(char[0], self.the_table.deck,
                               player.hands[1], player, move=None)
                     self.show_player(num-1, player.hands[1])
-
+                    if player.hands[1].done_flag is True:
+                        self.next_playerscreen(num)
+                else:
+                    print("Player has no hands to do action on")
                     # Check if we move on following possible final action
                     if player.hands[1].done_flag is True:
-                        if num == len(self.the_players):
-                            # Disable all buttons
-                            # Wait like 1 second
-                            self.calculate_winner()
-                            self.sm.current = 'endgamescreen'
-                        else:
-                            self.sm.current = f'player{num+1}'
+                        self.next_playerscreen(num)
+
             else:
                 if player.hands[0].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[0], player, move=None)
                     self.show_player(num-1, player.hands[0])
-
                     # Check if we move on following possible final action
                     if player.hands[0].done_flag is True:
-                        if num == len(self.the_players):
-                            # Disable all buttons
-                            # Wait like 1 second
-                            self.calculate_winner()
-                            self.sm.current = 'endgamescreen'
-                        else:
-                            self.sm.current = f'player{num+1}'
+                        self.next_playerscreen(num)
+                else:
+                    print("Player has no hands to do action on")
+                    # Check if we move on following possible final action
+                    if player.hands[0].done_flag is True:
+                        self.next_playerscreen(num)
 
         except Exception as e:
             print(e)
@@ -621,9 +625,34 @@ class TestApp(App):
     def show_player(self, player_num, player_hand):
         gf.show_player(player_num, player_hand)
 
-    def calculate_winner(self):
-        # first deal for dealer
-        # then for player in self.the_players, gf.calculate_winner()
+    def next_playerscreen(self, playernum):
+        if playernum == len(self.the_players):
+            # Disable all buttons
+            # Wait like 1 second
+            self.calculate_winners()
+            self.sm.current = 'endgamescreen'
+        else:
+            self.sm.current = f'player{playernum+1}'
+
+    def calculate_winners(self):
+        # Complete the Dealer's hand
+        while self.the_dealer.hand.score < 17 and self.the_dealer.hand.score != 21:
+            # Use the hit function from game_functions
+            gf.action('h', self.the_table.deck,
+                      self.the_dealer.hand, player=None, move=None)
+        self.show_dealer(self.the_dealer.hand)
+        self.sm.ids.dealerhand.add_widget(self.the_dealer.hand)
+
+        # Calculate the winner from all hands for all players
+        for player in self.the_players:
+            for handnum in range(len(player.hands)):
+                result = gf.calculate_winner(self.the_dealer.hand,
+                                             player.hands[handnum], player)
+                print(
+                    f"Player {player.player_num+1} you now have {player.wallet} credits.")
+                self.sm.ids.playerresults.add_widget(PlayerResult(
+                    playernum=player.player_num, result=result))
+
         return  # right now this is just placeholder
 
 

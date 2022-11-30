@@ -69,6 +69,22 @@
     EndGameScreen:
         id: endgamescreen
         name: 'endgamescreen'
+        BoxLayout:
+            orientation: 'vertical'
+            BoxLayout:
+                id: dealerhand
+                orientation: 'horizontal'
+                size_hint_y: 0.4
+                Label:
+                    text: 'Dealer Hand:'
+                    size_hint_x: 0.2
+            BoxLayout:
+                id: playerresults
+                orientation: 'horizontal'
+                size_hint_y: 0.4
+            Button:
+                text: 'New Game'
+                size_hint_y: 0.2
 
 <PlayerWager>:
     BoxLayout:
@@ -87,6 +103,14 @@
             text: 'v'
             size_hint_y: 0.3
             on_press: root.decrease_wager()
+
+<PlayerResult>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: f'Player {root.playernum}'
+        Label:
+            text: root.result
 
 <Player>:
     id: playerscreen

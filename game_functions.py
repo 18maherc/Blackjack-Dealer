@@ -101,69 +101,77 @@ def show_player(player_num: int, player_hand: Hand):
 
 
 # --- functions to handle end of game scenarios ---
-def player_busts(player: Player):
+def player_busts(player: Player) -> str:
     print("Player busts!")
     player.add_credits(0)
+    return 'lose'
 
 
-def player_wins(player: Player, hand: Hand):
+def player_wins(player: Player, hand: Hand) -> str:
     print("Player wins!")
     player.add_credits(2*hand.wager)
+    return 'win'
 
 
-def player_blackjack(player: Player, hand: Hand):
+def player_blackjack(player: Player, hand: Hand) -> str:
     print("Player won with blackjack!")
     player.add_credits(2.5*hand.wager)
+    return 'win'
 
 
-def dealer_busts(player: Player, hand: Hand):
+def dealer_busts(player: Player, hand: Hand) -> str:
     print("Dealer busts!")
     player.add_credits(2*hand.wager)
+    return 'win'
 
 
-def dealer_wins(player: Player):
+def dealer_wins(player: Player) -> str:
     print("Dealer wins!")
     player.add_credits(0)
+    return 'lose'
 
 
-def push(player: Player, hand: Hand):
+def push(player: Player, hand: Hand) -> str:
     print("Dealer and Player tie! It's a push.")
     player.add_credits(hand.wager)
+    return 'push'
 
 
-def calculate_winner(dealer_hand: Hand, player_hand: Hand, player: Player):
+def calculate_winner(dealer_hand: Hand, player_hand: Hand, player: Player) -> str:
     # Player hit 21
     if player_hand.score == 21:
         if player_hand.size == 2:
             if dealer_hand.score == 21:
                 if dealer_hand.size == 2:
-                    push(player, player_hand)
+                    result = push(player, player_hand)
                 else:
-                    player_blackjack(player, player_hand)
+                    result = player_blackjack(player, player_hand)
             else:
-                player_blackjack(player, player_hand)
+                result = player_blackjack(player, player_hand)
         else:
             if dealer_hand.score == 21:
                 if dealer_hand.size == 2:
-                    dealer_wins(player)
+                    result = dealer_wins(player)
                 else:
-                    push(player, player_hand)
+                    result = push(player, player_hand)
             else:
-                player_wins(player, player_hand)
+                result = player_wins(player, player_hand)
     # Player stayed under 21
     elif player_hand.score < 21:
         # Dealer goes over and Player is under
         if dealer_hand.score > 21:
-            dealer_busts(player, player_hand)
+            result = dealer_busts(player, player_hand)
         # Dealer and Player are both under but dealer is higher
         elif dealer_hand.score > player_hand.score:
-            dealer_wins(player)
+            result = dealer_wins(player)
         # Dealer and Player are both under but player is higher
         elif dealer_hand.score < player_hand.score:
-            player_wins(player, player_hand)
+            result = player_wins(player, player_hand)
         # Dealer and Player are tied
         else:
-            push(player, player_hand)
+            result = push(player, player_hand)
     # Player busted. A loss no matter Dealer's cards
     else:
-        player_busts(player)
+        result = player_busts(player)
+
+    return result
