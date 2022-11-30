@@ -14,8 +14,8 @@ class Move():
     def draw(self, c, frate=10000):
         zoff = -4.7 - (1.3*c/52)
         zoff = round(zoff,2)
-        f = [f"G1X125Y0Z0F{frate}", "G04P0", "S1000M03", "G04P0", f"G1X125Y0Z{zoff}F100", "G04P0", "G04P2", "G04P0",
-             "G1X125Y0Z0F200", "G04P0", f"G1X0Y0Z0F{frate}", "G04P0", "G0X0Y0Z-4.5", "G04P0", "M05", "G04P0", "G0X0Y0Z0", "G04P0", "G04P2", "G04P0"]
+        f = [f"G1X125Y0Z-1F{frate}", "G04P0", "S1000M03", "G04P0", f"G1X125Y0Z{zoff}F100", "G04P0", "G04P2", "G04P0",
+             "G1X125Y0Z-1F200", "G04P0", f"G1X0Y0Z-1F{frate}", "G04P0", "G0X0Y0Z-4.5", "G04P0", "M05", "G04P0", "G0X0Y0Z-1", "G04P0", "G04P2", "G04P0"]
         # Stream g-code to grbl
         for line in f:
             l = line.strip()  # Strip all EOL characters for consistency
@@ -32,17 +32,17 @@ class Move():
     def place(self, coord2, coord1=[0, 0], dealer=False, frate=10000):
         coord1[1] = -coord1[1]
         coord2[1] = -coord2[1]
-        f = [f"G01X{coord1[0]}Y{coord1[1]}Z0F{frate}", "M03",
-             f"G1X{coord1[0]}Y{coord1[1]}Z-6.0F100", "G04P2", f"G0X{coord1[0]}Y{coord1[1]}Z0"]
+        f = [f"G01X{coord1[0]}Y{coord1[1]}Z-1F{frate}", "M03",
+             f"G1X{coord1[0]}Y{coord1[1]}Z-6.0F100", "G04P2", f"G0X{coord1[0]}Y{coord1[1]}Z-1"]
 #         if dealer:
-#             f = ["G1X0Y0Z0F5000", "M03",
-#                  "G1X0Y0Z-6.0F100", "G04P2", "G1X0Y0Z0F200"]
+#             f = ["G1X0Y0Z-1F5000", "M03",
+#                  "G1X0Y0Z-6.0F100", "G04P2", "G1X0Y0Z-1F200"]
 #         else:
-#             f = ["G1X0Y0Z0F5000", "M03",
-#                  "G1X0Y0Z-6.0F100", "G04P2", "G1X0Y0Z0F200"]
+#             f = ["G1X0Y0Z-1F5000", "M03",
+#                  "G1X0Y0Z-6.0F100", "G04P2", "G1X0Y0Z-1F200"]
 # #             f = ["flip", "unflip", "flipped", "M03",
 # #                  "flipped + z", "G04P2", "flipped"]
-        d = [f"G01X{coord2[0]}Y{coord2[1]}Z0F{frate}", "M05", "G04P2", "G1X125Y0Z0F5000"]
+        d = [f"G01X{coord2[0]}Y{coord2[1]}Z-1F{frate}", f"G0X{coord2[0]}Y{coord2[1]}Z-4.5}", "M05", "G04P2",f"G01X{coord2[0]}Y{coord2[1]}Z-1F{frate}", "G1X125Y0Z-1F5000"]
         f.extend(d)
 
         # Stream g-code to grbl
@@ -59,7 +59,7 @@ class Move():
     def discard(self, stack, frate=10000):
         for c in stack:
 #             c[1] = -c[1]
-            f = [f"G01X{c[0]}Y{c[1]}Z0F{frate}","S1000M03",f"G01X{c[0]}Y{c[1]}Z-6.0F100\n","G04P2",f"G01X{c[0]}Y{c[1]}Z0F200","G1X250Y0Z0\n","M05","G04P2"]
+            f = [f"G01X{c[0]}Y{c[1]}Z-1F{frate}","S1000M03",f"G01X{c[0]}Y{c[1]}Z-6.0F100\n","G04P2",f"G01X{c[0]}Y{c[1]}Z-1F200","G1X250Y0Z-1\n","M05","G04P2"]
             for line in f:
                 l = line.strip()  # Strip all EOL characters for consistency
                 print('Sending: ' + l)
