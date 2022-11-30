@@ -1,9 +1,9 @@
 import math
 import random
-# from game_objects import *
 import game_functions as gf
 from communication import Move
 # from mainDetector import getCard
+# TODO: ^ UNCOMMENT THIS ^
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
@@ -13,7 +13,8 @@ from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.config import Config
-Config.set('graphics', 'fullscreen', 1)
+# Config.set('graphics', 'fullscreen', 1)
+# TODO: ^ UNCOMMENT THIS ^
 
 
 # Let's give the info of the card's suits, ranks and values
@@ -30,9 +31,6 @@ Builder.load_file('controller.kv')
 
 # ---- Game: ----
 while True:
-    # TODO: Display a splash screen with a start button
-
-    # TODO: Display a player number selection screen
     break
 
     # Play the game
@@ -220,6 +218,10 @@ while True:
 
 
 # Declare all screens
+class ScreenManager(ScreenManager):
+    pass
+
+
 class SplashScreen(Screen):
     # Intro screen with logo and start button
     pass
@@ -236,21 +238,18 @@ class WagerScreen(Screen):
 
 
 class EndGameScreen(Screen):
-    # This screen is to
+    # This screen is to show Dealer output and winners/losers
+    # Should also allow to play again or reset the game
     pass
 
 
-class ScreenManager(ScreenManager):
-    pass
-
-
+# Declare all game/gui objects
 class Card():
     def __init__(self, suit, value):
         self.suit = suit
         self.value = value
         self.points = points[value]
         self.coords = [250, 80]
-        # ^ TODO find out coordinate stuff here ^
         self.filename = f"{self.value}_{self.suit}.png"
 
     def to_string(self) -> str:
@@ -269,13 +268,10 @@ class Hand(BoxLayout):
         self.wager = 1
         self.surrender_flag = False
         self.base_coords = [250, 80]
-        # ^ TODO find out coordinate stuff here ^
 
     def add_card(self, card: Card):
         card.coords[0] = self.base_coords[0] - 25*(self.length)
-        # ^ TODO find out coordinate stuff here ^
         card.coords[1] = self.base_coords[1]
-        # ^ TODO find out coordinate stuff here ^
         self.length += 1
         self.cards.append(card)
         self.score += card.points
@@ -305,13 +301,10 @@ class DealerHand(BoxLayout):
         self.score = 0
         self.done_flag = False
         self.base_coords = [0, 165]
-        # ^ TODO find out coordinate stuff here ^
 
     def add_card(self, card: Card):
         card.coords[0] = self.base_coords[0]
-        # ^ TODO find out coordinate stuff here ^
         card.coords[1] = self.base_coords[1] + 25*(self.length)
-        # ^ TODO find out coordinate stuff here ^
         self.length += 1
         self.cards.append(card)
         self.score += card.points
@@ -360,7 +353,6 @@ class Player(Screen):
         # Set the base coordinates of the new hand
         hand.base_coords[0] = self.base_coords[0]
         hand.base_coords[1] = self.base_coords[1] + 25*len(self.hands)
-        # ^ TODO find out coordinate stuff here ^
         # Add the new hand to the player
         self.hands.append(hand)
         self.ids.hand_layout.add_widget(hand)
@@ -368,7 +360,7 @@ class Player(Screen):
     def delete_hand(self, hand: Hand):
         for card in hand.cards:
             card_stack.remove(card.coords)
-        self.remove_widget(hand)
+        self.remove_widget(self.ids.hand_layout.children[0])
         self.hands.remove(hand)
 
     def split_hand(self):
@@ -442,7 +434,6 @@ class PlayerWager(BoxLayout):
 class Dealer():
     def __init__(self, hand: DealerHand):
         hand.base_coords = [0, 165]
-        # ^ TODO find out coordinate stuff here ^
         self.hand = hand
 
 
@@ -536,40 +527,45 @@ class TestApp(App):
 
         # Set wagers
         for i in range(len(self.the_players)):
-            self.the_players[i].wager = self.sm.ids.players.children[(
+            set_wager = self.sm.ids.players.children[(
                 len(self.the_players)-1)-i].wager
+            if set_wager > self.the_players[i].wallet:
+                set_wager = self.the_players[i].wallet
+            self.the_players[i].wager = set_wager
             self.the_players[i].remove_credits(self.the_players[i].wager)
 
         # Deal first card to every player and the dealer. Also set the wager
         for playernum in range(len(self.the_players)):
             # Draw a physical card
-            # move.draw(len(card_stack))
-            # TODO: Read the physical card in
+            # TODO: move.draw(len(card_stack))
+            # TODO: the_card = getCard()
             the_card = self.the_table.deck.deal()
             # Represent the physical card digitally
             self.the_players[playernum].hands[0].add_card(the_card)
             # Place the card at its physical location after flipping
-            # move.place(the_card.coords)
+            # TODO: move.place(the_card.coords)
         # Draw a physical card
-        # move.draw(len(card_stack))
-        # TODO: Read the physical card in
+        # TODO: move.draw(len(card_stack))
+        # TODO: the_card = getCard()
         the_card = self.the_table.deck.deal()
         # Represent the physical card digitally
         self.the_dealer.hand.add_card(the_card)
         # Place the card at its physical location without flipping
-        # move.place(the_card.coords, dealer=True)
+        # TODO: move.place(the_card.coords, dealer=True)
 
         # Deal second card to every player and the dealer
         for playernum in range(len(self.the_players)):
-            # move.draw(len(card_stack))
+            # TODO: move.draw(len(card_stack))
+            # TODO: the_card = getCard()
             the_card = self.the_table.deck.deal()
             self.the_players[playernum].hands[0].add_card(the_card)
-            # move.place(the_card.coords)
+            # TODO: move.place(the_card.coords)
             self.show_player(playernum, self.the_players[playernum].hands[0])
-        # move.draw(len(card_stack))
+        # TODO: move.draw(len(card_stack))
+        # TODO: the_card = getCard()
         self.the_table.deck.deal()
         self.the_dealer.hand.add_card(the_card)
-        # move.place(the_card.coords)
+        # TODO: move.place(the_card.coords)
         self.show_dealer_hidden(self.the_dealer.hand)
 
     def action(self, char, num):
@@ -579,22 +575,37 @@ class TestApp(App):
                 if player.hands[0].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[0], player, move=None)
-                    self.show_player(num, player.hands[0])
+                    self.show_player(num-1, player.hands[0])
                 elif player.hands[1].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[1], player, move=None)
-                    self.show_player(num, player.hands[1])
-                else:
-                    print(f"Player {num} has no hands to do action on")
-                    self.sm.current = f'player{num+1}'
+                    self.show_player(num-1, player.hands[1])
+
+                    # Check if we move on following possible final action
+                    if player.hands[1].done_flag is True:
+                        if num == len(self.the_players):
+                            # Disable all buttons
+                            # Wait like 1 second
+                            self.calculate_winner()
+                            self.sm.current = 'endgamescreen'
+                        else:
+                            self.sm.current = f'player{num+1}'
             else:
                 if player.hands[0].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[0], player, move=None)
-                    self.show_player(num, player.hands[0])
-                else:
-                    print(f"Player {num} has no hands to do action on")
-                    self.sm.current = f'player{num+1}'
+                    self.show_player(num-1, player.hands[0])
+
+                    # Check if we move on following possible final action
+                    if player.hands[0].done_flag is True:
+                        if num == len(self.the_players):
+                            # Disable all buttons
+                            # Wait like 1 second
+                            self.calculate_winner()
+                            self.sm.current = 'endgamescreen'
+                        else:
+                            self.sm.current = f'player{num+1}'
+
         except Exception as e:
             print(e)
 
@@ -608,7 +619,12 @@ class TestApp(App):
         gf.show_dealer_hidden(hand)
 
     def show_player(self, player_num, player_hand):
-        gf.show_player(player_num-1, player_hand)
+        gf.show_player(player_num, player_hand)
+
+    def calculate_winner(self):
+        # first deal for dealer
+        # then for player in self.the_players, gf.calculate_winner()
+        return  # right now this is just placeholder
 
 
 if __name__ == '__main__':

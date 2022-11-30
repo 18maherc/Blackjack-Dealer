@@ -27,11 +27,10 @@ def action(x: str, deck: Deck, hand: Hand, player: Player, move: Move):
 
 
 def hit(deck: Deck, hand: Hand, move: Move):
-    # move.draw(len(card_stack))
-    # TODO: read physical card in
-    # hand.add_card(getCard())
+    # TODO: move.draw(len(card_stack))
+    # TODO: hand.add_card(getCard())
     hand.add_card(deck.deal())
-    # move.place(hand.cards[-1].coords)
+    # TODO: move.place(hand.cards[-1].coords)
 
 
 def stand(hand: Hand):
