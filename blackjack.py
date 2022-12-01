@@ -265,6 +265,7 @@ class Hand(BoxLayout):
         self.done_flag = False
         self.surrender_flag = False
         self.base_coords = [250, 80]
+        self.padding = [20, 0]
 
     def add_card(self, card: Card):
         card.coords[0] = self.base_coords[0] - 25*(self.length)
@@ -407,12 +408,27 @@ class Player(Screen):
     def remove_credits(self, credits: int):
         self.wallet -= math.ceil(credits)
 
+    def action_btns_state(self, boolean: bool):
+        """Toggles the status of the action buttons for the player.
+        \nSets the disabled property of the button.
+        \nFor readability/usability, input follows True = On
+
+        Args:
+            boolean (bool): The state in which you want the buttons (True = On)
+        """
+        self.ids.hit.disabled = not boolean
+        self.ids.stand.disabled = not boolean
+        self.ids.split.disabled = not boolean
+        self.ids.double.disabled = not boolean
+        self.ids.surrender.disabled = not boolean
+
     def clear(self):
         self.hands.clear()
         self.ids.hand_layout.clear_widgets(self.ids.hand_layout.children)
         self.add_hand(Hand())
         self.split_flag = False
         self.insurance_flag = False
+        self.action_btns_state(True)
 
     pass
 
@@ -631,6 +647,7 @@ class TestApp(App):
         gf.show_player(player_num, player_hand)
 
     def next_playerscreen(self, playernum):
+        self.the_players[playernum-1].action_btns_state(False)
         if playernum == len(self.the_players):
             # Disable all buttons
             # Wait like 1 second
