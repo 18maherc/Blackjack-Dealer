@@ -153,10 +153,7 @@
             size_hint_y: 0.3
             Button:
                 text: 'Prev player'
-                on_press: root.manager.current = f'player{root.player_num-1}'
-            Button:
-                text: 'next player'
-                on_press: root.manager.current = f'player{root.player_num+1}'
+                on_press: app.prev_player()
             Button:
                 id: hit
                 text: 'Hit'
@@ -197,4 +194,7 @@
                 background_normal: ''
                 background_color: (0.7, 0.05, 0.2, 1)
                 on_press: app.action('l', root.player_num)
+            Button:
+                text: 'next player'
+                on_press: app.next_player()
             

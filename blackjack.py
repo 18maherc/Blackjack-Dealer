@@ -11,7 +11,7 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+from kivy.properties import ObjectProperty, NumericProperty
 from kivy.config import Config
 # Config.set('graphics', 'fullscreen', 1)
 # TODO: ^ UNCOMMENT THIS ^
@@ -343,6 +343,7 @@ class Player(Screen):
         self.wager = 1
         self.split_flag = False
         self.insurance_flag = False
+        self.done_flag = False
         self.name = name
         self.player_num = player_num
         self.base_coords = [250, 80+110*(self.player_num-1)]
@@ -428,6 +429,7 @@ class Player(Screen):
         self.add_hand(Hand())
         self.split_flag = False
         self.insurance_flag = False
+        self.done_flag = False
         self.action_btns_state(True)
 
     pass
@@ -609,12 +611,14 @@ class TestApp(App):
                     # TODO: set move=move
                     self.show_player(num-1, player.hands[1])
                     if player.hands[1].done_flag is True:
-                        self.next_playerscreen(num)
+                        player.action_btns_state(False)
+                        player.done_flag = True
                 else:
                     print("Player has no hands to do action on")
                     # Check if we move on following possible final action
                     if player.hands[1].done_flag is True:
-                        self.next_playerscreen(num)
+                        player.action_btns_state(False)
+                        player.done_flag = True
 
             else:
                 if player.hands[0].done_flag is not True:
@@ -624,12 +628,15 @@ class TestApp(App):
                     self.show_player(num-1, player.hands[0])
                     # Check if we move on following possible final action
                     if player.hands[0].done_flag is True:
-                        self.next_playerscreen(num)
+                        player.action_btns_state(False)
+                        player.done_flag = True
+
                 else:
                     print("Player has no hands to do action on")
                     # Check if we move on following possible final action
                     if player.hands[0].done_flag is True:
-                        self.next_playerscreen(num)
+                        player.action_btns_state(False)
+                        player.done_flag = True
 
         except Exception as e:
             print(e)
@@ -646,15 +653,25 @@ class TestApp(App):
     def show_player(self, player_num, player_hand):
         gf.show_player(player_num, player_hand)
 
-    def next_playerscreen(self, playernum):
-        self.the_players[playernum-1].action_btns_state(False)
-        if playernum == len(self.the_players):
-            # Disable all buttons
-            # Wait like 1 second
-            self.calculate_winners()
-            self.sm.current = 'endgamescreen'
-        else:
-            self.sm.current = f'player{playernum+1}'
+    def next_player(self):
+        current = self.sm.current
+        if current[:6] == 'player':
+            num = int(current[6])
+            if num == len(self.the_players):
+                for i in range(len(self.the_players)):
+                    if self.the_players[i].done_flag is not True:
+                        return
+                self.calculate_winners()
+                self.sm.current = 'endgamescreen'
+            else:
+                self.sm.current = f'player{num+1}'
+
+    def prev_player(self):
+        current = self.sm.current
+        if current[:6] == 'player':
+            num = int(current[6])
+            if num > 1:
+                self.sm.current = f'player{num-1}'
 
     def calculate_winners(self):
         # Complete the Dealer's hand
