@@ -2,7 +2,7 @@ import math
 import random
 import game_functions as gf
 from communication import Move
-from mainDetector import getCard
+import mainDetector
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
@@ -382,14 +382,14 @@ class TestApp(App):
         for playernum in range(len(self.the_players)):
             # Draw a physical card
             move.draw(len(card_stack))
-            the_card = getCard()
+            the_card = mainDetector.getCard()
             # Represent the physical card digitally
             self.the_players[playernum].hands[0].add_card(the_card)
             # Place the card at its physical location after flipping
             move.place(the_card.coords)
         # Draw a physical card
         move.draw(len(card_stack))
-        the_card = getCard()
+        the_card = mainDetector.getCard()
         # Represent the physical card digitally
         self.the_dealer.hand.add_card(the_card)
         # Place the card at its physical location without flipping
@@ -398,12 +398,12 @@ class TestApp(App):
         # Deal second card to every player and the dealer
         for playernum in range(len(self.the_players)):
             move.draw(len(card_stack))
-            the_card = getCard()
+            the_card = mainDetector.getCard()
             self.the_players[playernum].hands[0].add_card(the_card)
             move.place(the_card.coords)
             self.show_player(playernum, self.the_players[playernum].hands[0])
         move.draw(len(card_stack))
-        the_card = getCard()
+        the_card = mainDetector.getCard()
         self.the_dealer.hand.add_card(the_card)
         move.place(the_card.coords)
         self.show_dealer_hidden(self.the_dealer.hand)
