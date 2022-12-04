@@ -43,10 +43,10 @@ def split(deck: Deck, player: Player, move: Move):
 
 def double(deck: Deck, hand: Hand, player: Player, move: Move):
     if len(hand.cards) == 2:
-        if player.wallet >= hand.wager:
-            player.remove_credits(hand.wager)
+        if player.wallet >= player.wager:
+            player.remove_credits(player.wager)
             hit(deck, hand, move)
-            hand.wager *= 2
+            player.wager *= 2
             hand.done_flag = True
         else:
             raise Exception("Do not have enough credits to double down")
