@@ -5,7 +5,7 @@ import os
 
 from dataStream import VideoStream
 from CardDetector import Detector
-from blackjack import Card
+import blackjack
 
 
 def getCard():
@@ -31,9 +31,9 @@ def getCard():
         #cv2.imshow("Suit Pulled", suitSent)
         #cv2.imshow("Value pulled", valueSent)
         if len(aceArray) == 0 and len(array1) == 0 and len(array2) == 0:
-            cardIdentity = Card('Joker', 'Joker')
+            cardIdentity = blackjack.Card('Joker', 'Joker')
         elif len(aceArray) == 1 and len(array1) == 0:
-            cardIdentity = Card('Spades', 'Ace')
+            cardIdentity = blackjack.Card('Spades', 'Ace')
         elif len(array2) > 0:
             cardIdentity = detect.findFaceCardTest(img, contours)
             #cardIdentity = detect.findFaceCard(img,array2,array3)
