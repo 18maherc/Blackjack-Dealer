@@ -66,7 +66,7 @@ class Move():
         for c in stack:
             c[1] = c[1]
             f = [f"G01X{c[0]}Y{c[1]}Z-1F{frate}", "S1000M03", f"G01X{c[0]}Y{c[1]}Z-6.0F200",
-                 "G04P2", f"G01X{c[0]}Y{c[1]}Z0F200", "G0X250Y-10Z0", "M05", "G04P2"]
+                 "G04P2", f"G01X{c[0]}Y{c[1]}Z0F200", "G0X250Y-20Z0", "M05", "G04P2"]
             for line in f:
                 l = line.strip()  # Strip all EOL characters for consistency
                 print('Sending: ' + l)

@@ -5,7 +5,7 @@ import time
 import string
 import statistics
 
-from blackjack import Card
+import blackjack
 
 
 class Detector:
@@ -133,7 +133,7 @@ class Detector:
 
         cardString = faceArray[faceIndex] + " of " + suitArray[suitIndex]
 
-        foundCard = Card(suitArray[suitIndex], faceArray[faceIndex])
+        foundCard = blackjack.Card(suitArray[suitIndex], faceArray[faceIndex])
         return foundCard
 
     def editCard(self, img):
@@ -293,7 +293,8 @@ class Detector:
 
         cardString = predictedValue + 'of' + self.suitArray[suitIndex]
 
-        foundCard = Card(suitArray[suitIndex], valueArray[valueIndex])
+        foundCard = blackjack.Card(
+            suitArray[suitIndex], valueArray[valueIndex])
         return foundCard
 
         # cv2.destroyAllWindows()
