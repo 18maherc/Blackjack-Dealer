@@ -5,7 +5,7 @@ import time
 import string
 import statistics
 
-from game_objects import Card
+from blackjack import Card
 
 
 class Detector:
