@@ -1,7 +1,7 @@
 from mainDetector import getCard
 
 import time
-from game_objects import Card
+from blackjack import Card
 
 start_time = time.time()
 receivedcard = getCard()

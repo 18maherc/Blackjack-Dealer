@@ -5,7 +5,7 @@ import os
 
 from dataStream import VideoStream
 from CardDetector import Detector
-from game_objects import Card
+from blackjack import Card
 
 
 def getCard():
