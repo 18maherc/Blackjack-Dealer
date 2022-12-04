@@ -1,8 +1,8 @@
 import math
 import random
+import mainDetector
 import game_functions as gf
 from communication import Move
-import mainDetector
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
