@@ -207,7 +207,7 @@ class Player(Screen):
                     self.remove_credits(self.wager)
 
                     # Use move to split the two cards
-                    # TODO: move.place(second_card.coords, second_prev_coords)
+                    move.place(second_card.coords, second_prev_coords)
 
                     # Turn on the flag for this player
                     self.split_flag = True
