@@ -332,14 +332,14 @@ class DealerHand(BoxLayout):
 
 class Player(Screen):
     player_num = NumericProperty(defaultvalue=1)
-    wallet = NumericProperty(defaultvalue=10)
+    wallet = NumericProperty(defaultvalue=100)
     hands = ObjectProperty(defaultvalue=[])
     wager = NumericProperty(defaultvalue=1)
     # Each player will have their own instance of this
 
     def __init__(self, name, player_num, **kwargs):
         super().__init__(**kwargs)
-        self.wallet = 10
+        self.wallet = 100
         self.wager = 1
         self.split_flag = False
         self.insurance_flag = False
@@ -387,11 +387,17 @@ class Player(Screen):
                     # Take money for hand's wager
                     self.remove_credits(self.wager)
 
+                    # Save the coordinates of the second card
+                    second_prev_coords = second_card.coords
+
                     # Repeat for the other card
                     new_hand2 = Hand()
                     new_hand2.add_card(second_card)
                     self.add_hand(new_hand2)
                     self.remove_credits(self.wager)
+
+                    # Use move to split the two cards
+                    # TODO: move.place(second_card.coords, second_prev_coords)
 
                     # Turn on the flag for this player
                     self.split_flag = True
