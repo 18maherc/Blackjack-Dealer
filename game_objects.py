@@ -1,7 +1,5 @@
 import math
 import random
-import game_functions as gf
-from communication import Move
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.button import Button
@@ -13,8 +11,6 @@ from kivy.uix.label import Label
 from kivy.properties import ObjectProperty, NumericProperty
 
 
-
-
 # Let's give the info of the card's suits, ranks and values
 suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
 values = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
@@ -24,6 +20,8 @@ points = {'Two': 2, 'Three': 3, 'Four': 4, 'Five': 5, 'Six': 6, 'Seven': 7, 'Eig
 card_stack = []
 
 # Declare all game/gui objects
+
+
 class Card():
     def __init__(self, suit, value):
         self.suit = suit
