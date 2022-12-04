@@ -36,7 +36,7 @@ def stand(hand: blackjack.Hand):
 
 
 def split(deck: blackjack.Deck, player: blackjack.Player, move: Move):
-    player.split_hand()
+    player.split_hand(move)
     hit(deck, player.hands[0], move)
     hit(deck, player.hands[1], move)
 

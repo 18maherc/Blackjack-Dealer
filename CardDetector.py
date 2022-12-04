@@ -5,7 +5,7 @@ import time
 import string
 import statistics
 
-import blackjack
+from game_objects import Card
 
 
 class Detector:
@@ -133,7 +133,7 @@ class Detector:
 
         cardString = faceArray[faceIndex] + " of " + suitArray[suitIndex]
 
-        foundCard = blackjack.Card(suitArray[suitIndex], faceArray[faceIndex])
+        foundCard = Card(suitArray[suitIndex], faceArray[faceIndex])
         return foundCard
 
     def editCard(self, img):
@@ -293,7 +293,7 @@ class Detector:
 
         cardString = predictedValue + 'of' + self.suitArray[suitIndex]
 
-        foundCard = blackjack.Card(
+        foundCard = Card(
             suitArray[suitIndex], valueArray[valueIndex])
         return foundCard
 
