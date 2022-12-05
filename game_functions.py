@@ -26,10 +26,10 @@ def action(x: str, deck: Deck, hand: Hand, player: Player, move: Move):
 
 
 def hit(deck: Deck, hand: Hand, move: Move):
-    move.draw(len(card_stack))
+    # move.draw(len(card_stack))
     # hand.add_card(mainDetector.getCard())
     hand.add_card(deck.deal())
-    move.place(hand.cards[-1].coords)
+    # move.place(hand.cards[-1].coords)
 
 
 def stand(hand: Hand):
@@ -37,7 +37,7 @@ def stand(hand: Hand):
 
 
 def split(deck: Deck, player: Player, move: Move):
-    player.split_hand(move)
+    player.split_hand()
     hit(deck, player.hands[0], move)
     hit(deck, player.hands[1], move)
 
