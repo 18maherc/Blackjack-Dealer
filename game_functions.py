@@ -148,7 +148,7 @@ def push(player: Player, hand: Hand) -> str:
         return 'push'
 
 
-def surrender(player: Player):
+def surrendered(player: Player):
     print("This hand was surrendered")
     player.add_credits(0.5*player.wager)
     return 'surrendered'
@@ -156,7 +156,7 @@ def surrender(player: Player):
 
 def calculate_winner(dealer_hand: Hand, player_hand: Hand, player: Player) -> str:
     if player_hand.surrender_flag:
-        result = surrender(player)
+        result = surrendered(player)
     else:
         # Player hit 21
         if player_hand.score == 21:
