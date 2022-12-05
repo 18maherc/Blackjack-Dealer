@@ -93,7 +93,8 @@
                 text: 'New Game'
                 font_size: 30
                 size_hint_y: 0.2
-                on_press: app.new_game(); root.current = 'wagerscreen'
+                on_press: app.new_game(); 
+                on_release: root.current = 'wagerscreen'
 
 <PlayerWager>:
     BoxLayout:
@@ -161,7 +162,8 @@
                 bold: True
                 background_normal: ''
                 background_color: (0, 1, 0, 0.7)
-                on_press: app.action('h', root.player_num)
+                on_press: root.action_btns_state(False)
+                on_release: app.action('h', root.player_num)
             Button:
                 id: stand
                 text: 'Stand'

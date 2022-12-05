@@ -1,3 +1,4 @@
+from game_objects import card_stack
 from game_objects import *
 from mainDetector import getCard
 import game_functions as gf
