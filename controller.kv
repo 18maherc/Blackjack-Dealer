@@ -70,7 +70,8 @@
                 text: 'Submit Wagers'
                 size_hint_y: 0.2
                 font_size: 30
-                on_press: app.init_table(); root.current = 'player1'
+                on_press: self.disabled = True
+                on_release: app.init_table(); root.current = 'player1'
 
     EndGameScreen:
         id: endgamescreen
@@ -90,11 +91,12 @@
                 orientation: 'horizontal'
                 size_hint_y: 0.4
             Button:
+                id: new_game_button
                 text: 'New Game'
                 font_size: 30
                 size_hint_y: 0.2
-                on_press: app.new_game(); 
-                on_release: root.current = 'wagerscreen'
+                on_press: self.disabled = True
+                on_release: app.new_game(); root.current = 'wagerscreen'
 
 <PlayerWager>:
     BoxLayout:

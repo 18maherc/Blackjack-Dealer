@@ -245,6 +245,9 @@ class TestApp(App):
         # Clear the Player results widget(s)
         self.sm.ids.playerresults.clear_widgets(
             self.sm.ids.playerresults.children)
+        # Reenable some disabled buttons
+        self.sm.ids.go_button.disabled = False
+        self.sm.ids.new_game_button.disabled = False
 
 
 if __name__ == '__main__':
