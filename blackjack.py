@@ -1,4 +1,3 @@
-from game_objects import card_stack
 from game_objects import *
 from mainDetector import getCard
 import game_functions as gf
@@ -225,7 +224,7 @@ class TestApp(App):
         # Physically collect all cards
         move.discard(card_stack)
         # Reset the card stack
-        card_stack = []
+        card_stack.clear()
         # Clear the Dealer's hand widget
         self.sm.ids.dealerhand.clear_widgets(self.sm.ids.dealerhand.children)
         # Add the default label back into the Dealer's hand widget
