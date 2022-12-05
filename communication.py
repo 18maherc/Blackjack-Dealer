@@ -35,7 +35,7 @@ class Move():
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
     def place(self, coord2, coord1=[0, 0], dealer=False, frate=10000):
-        coord1[1] = -coord1[1]
+        coord1[1] = coord1[1]
         coord2[1] = -coord2[1]
         f = [f"G01X{coord1[0]}Y{coord1[1]}Z-1F{frate}", "M03",
              f"G1X{coord1[0]}Y{coord1[1]}Z-6.0F200", "G04P1", f"G0X{coord1[0]}Y{coord1[1]}Z-1"]
@@ -66,7 +66,7 @@ class Move():
         for c in stack:
             c[1] = c[1]
             f = [f"G01X{c[0]}Y{c[1]}Z-1F{frate}", "S1000M03", f"G01X{c[0]}Y{c[1]}Z-6.0F200",
-                 "G04P2", f"G01X{c[0]}Y{c[1]}Z0F200", "G0X250Y-20Z0", "M05", "G04P2"]
+                 "G04P2", f"G01X{c[0]}Y{c[1]}Z0F200", "G0X250Y-15Z0", "M05", "G04P2"]
             for line in f:
                 l = line.strip()  # Strip all EOL characters for consistency
                 print('Sending: ' + l)

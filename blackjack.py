@@ -131,6 +131,7 @@ class TestApp(App):
                     gf.action(char[0], self.the_table.deck,
                               player.hands[0], player, move=None)
                     self.show_player(num-1, player.hands[0])
+                    player.action_btns_state(True)
                 elif player.hands[1].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[1], player, move=None)
