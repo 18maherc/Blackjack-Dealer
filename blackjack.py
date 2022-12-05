@@ -134,12 +134,18 @@ class TestApp(App):
                     if player.hands[1].done_flag is True:
                         player.action_btns_state(False)
                         player.done_flag = True
+                    else:
+                        player.action_btns_state(True)
+                        player.done_flag = False
                 else:
                     print("Player has no hands to do action on")
                     # Check if we move on following possible final action
                     if player.hands[1].done_flag is True:
                         player.action_btns_state(False)
                         player.done_flag = True
+                    else:
+                        player.action_btns_state(True)
+                        player.done_flag = False
 
             else:
                 if player.hands[0].done_flag is not True:
@@ -150,6 +156,9 @@ class TestApp(App):
                     if player.hands[0].done_flag is True:
                         player.action_btns_state(False)
                         player.done_flag = True
+                    else:
+                        player.action_btns_state(True)
+                        player.done_flag = False
 
                 else:
                     print("Player has no hands to do action on")
@@ -157,6 +166,9 @@ class TestApp(App):
                     if player.hands[0].done_flag is True:
                         player.action_btns_state(False)
                         player.done_flag = True
+                    else:
+                        player.action_btns_state(True)
+                        player.done_flag = False
 
         except Exception as e:
             print(e)

@@ -171,7 +171,8 @@
                 bold: True
                 background_normal: ''
                 background_color: (1, 0, 0, 0.8)
-                on_press: app.action('s', root.player_num)
+                on_press: root.action_btns_state(False)
+                on_release: app.action('s', root.player_num)
             Button:
                 id: split
                 text: 'Split'
@@ -179,7 +180,8 @@
                 bold: True
                 background_normal: ''
                 background_color: (0, 0, 1, 0.8)
-                on_press: app.action('p', root.player_num)
+                on_press: root.action_btns_state(False)
+                on_release: app.action('p', root.player_num)
             Button:
                 id: double
                 text: 'Double'
@@ -187,7 +189,8 @@
                 bold: True
                 background_normal: ''
                 background_color: (0.9, 0.6, 0.3, 1)
-                on_press: app.action('d', root.player_num)
+                on_press: root.action_btns_state(False)
+                on_release: app.action('d', root.player_num)
             Button:
                 id: surrender
                 text: 'Surrender'
@@ -195,7 +198,8 @@
                 bold: True
                 background_normal: ''
                 background_color: (0.7, 0.05, 0.2, 1)
-                on_press: app.action('l', root.player_num)
+                on_press: root.action_btns_state(False)
+                on_release: app.action('l', root.player_num)
             Button:
                 text: 'next player'
                 on_press: app.next_player()
