@@ -46,7 +46,7 @@ def double(deck: Deck, hand: Hand, player: Player, move: Move):
         if player.wallet >= player.wager:
             player.remove_credits(player.wager)
             hit(deck, hand, move)
-            player.wager *= 2
+            hand.double_flag = True
             hand.done_flag = True
         else:
             raise Exception("Do not have enough credits to double down")
@@ -103,10 +103,15 @@ def player_busts(player: Player) -> str:
     return 'lose'
 
 
-def player_wins(player: Player) -> str:
-    print("Player wins!")
-    player.add_credits(2*player.wager)
-    return 'win'
+def player_wins(player: Player, hand: Hand) -> str:
+    if hand.double_flag:
+        print("Player wins!")
+        player.add_credits(4*player.wager)
+        return 'win'
+    else:
+        print("Player wins!")
+        player.add_credits(2*player.wager)
+        return 'win'
 
 
 def player_blackjack(player: Player) -> str:
@@ -115,10 +120,15 @@ def player_blackjack(player: Player) -> str:
     return 'win'
 
 
-def dealer_busts(player: Player) -> str:
-    print("Dealer busts!")
-    player.add_credits(2*player.wager)
-    return 'win'
+def dealer_busts(player: Player, hand: Hand) -> str:
+    if hand.double_flag:
+        print("Dealer busts!")
+        player.add_credits(4*player.wager)
+        return 'win'
+    else:
+        print("Dealer busts!")
+        player.add_credits(2*player.wager)
+        return 'win'
 
 
 def dealer_wins(player: Player) -> str:
@@ -127,47 +137,61 @@ def dealer_wins(player: Player) -> str:
     return 'lose'
 
 
-def push(player: Player) -> str:
-    print("Dealer and Player tie! It's a push.")
-    player.add_credits(player.wager)
-    return 'push'
+def push(player: Player, hand: Hand) -> str:
+    if hand.double_flag:
+        print("Dealer and Player tie! It's a push.")
+        player.add_credits(2*player.wager)
+        return 'push'
+    else:
+        print("Dealer and Player tie! It's a push.")
+        player.add_credits(player.wager)
+        return 'push'
+
+
+def surrender(player: Player):
+    print("This hand was surrendered")
+    player.add_credits(0.5*player.wager)
+    return 'surrendered'
 
 
 def calculate_winner(dealer_hand: Hand, player_hand: Hand, player: Player) -> str:
-    # Player hit 21
-    if player_hand.score == 21:
-        if player_hand.size == 2:
-            if dealer_hand.score == 21:
-                if dealer_hand.size == 2:
-                    result = push(player)
+    if player_hand.surrender_flag:
+        result = surrender(player)
+    else:
+        # Player hit 21
+        if player_hand.score == 21:
+            if player_hand.size == 2:
+                if dealer_hand.score == 21:
+                    if dealer_hand.size == 2:
+                        result = push(player, player_hand)
+                    else:
+                        result = player_blackjack(player)
                 else:
                     result = player_blackjack(player)
             else:
-                result = player_blackjack(player)
-        else:
-            if dealer_hand.score == 21:
-                if dealer_hand.size == 2:
-                    result = dealer_wins(player)
+                if dealer_hand.score == 21:
+                    if dealer_hand.size == 2:
+                        result = dealer_wins(player)
+                    else:
+                        result = push(player, player_hand)
                 else:
-                    result = push(player)
+                    result = player_wins(player, player_hand)
+        # Player stayed under 21
+        elif player_hand.score < 21:
+            # Dealer goes over and Player is under
+            if dealer_hand.score > 21:
+                result = dealer_busts(player, player_hand)
+            # Dealer and Player are both under but dealer is higher
+            elif dealer_hand.score > player_hand.score:
+                result = dealer_wins(player)
+            # Dealer and Player are both under but player is higher
+            elif dealer_hand.score < player_hand.score:
+                result = player_wins(player, player_hand)
+            # Dealer and Player are tied
             else:
-                result = player_wins(player)
-    # Player stayed under 21
-    elif player_hand.score < 21:
-        # Dealer goes over and Player is under
-        if dealer_hand.score > 21:
-            result = dealer_busts(player)
-        # Dealer and Player are both under but dealer is higher
-        elif dealer_hand.score > player_hand.score:
-            result = dealer_wins(player)
-        # Dealer and Player are both under but player is higher
-        elif dealer_hand.score < player_hand.score:
-            result = player_wins(player)
-        # Dealer and Player are tied
+                result = push(player, player_hand)
+        # Player busted. A loss no matter Dealer's cards
         else:
-            result = push(player)
-    # Player busted. A loss no matter Dealer's cards
-    else:
-        result = player_busts(player)
+            result = player_busts(player)
 
     return result

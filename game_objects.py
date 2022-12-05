@@ -42,6 +42,7 @@ class Hand(BoxLayout):
         self.score = 0
         self.done_flag = False
         self.surrender_flag = False
+        self.double_flag = False
         self.base_coords = [250, 80]
         self.padding = [20, 0]
 
