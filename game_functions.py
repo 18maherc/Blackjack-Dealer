@@ -1,7 +1,7 @@
 from game_objects import *
 from communication import Move
-import mainDetector
-move = Move()
+# import mainDetector
+# move = Move()
 
 
 # ---- Game Functions: ----
@@ -27,7 +27,8 @@ def action(x: str, deck: Deck, hand: Hand, player: Player, move: Move):
 
 def hit(deck: Deck, hand: Hand, move: Move):
     move.draw(len(card_stack))
-    hand.add_card(mainDetector.getCard())
+    # hand.add_card(mainDetector.getCard())
+    hand.add_card(deck.deal())
     move.place(hand.cards[-1].coords)
 
 

@@ -143,7 +143,7 @@ class Player(Screen):
         self.ids.hand_layout.clear_widgets(self.ids.hand_layout.children)
         self.hands.remove(hand)
 
-    def split_hand(self, move):
+    def split_hand(self):
         # You can only split if you have one hand
         if len(self.hands) == 1:
             # You can only split a 2 card hand
@@ -176,7 +176,7 @@ class Player(Screen):
                     self.remove_credits(self.wager)
 
                     # Use move to split the two cards
-                    move.place(second_card.coords, second_prev_coords)
+                    # move.place(second_card.coords, second_prev_coords)
 
                     # Turn on the flag for this player
                     self.split_flag = True

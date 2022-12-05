@@ -1,5 +1,5 @@
 from game_objects import *
-from mainDetector import getCard
+# from mainDetector import getCard
 import game_functions as gf
 from communication import Move
 from kivy.app import App
@@ -10,8 +10,8 @@ from kivy.properties import ObjectProperty, NumericProperty
 from kivy.config import Config
 
 
-move = Move()
-Config.set('graphics', 'fullscreen', 1)
+# move = Move()
+# Config.set('graphics', 'fullscreen', 1)
 Builder.load_file('controller.kv')
 
 
@@ -92,31 +92,35 @@ class TestApp(App):
         # Deal first card to every player and the dealer. Also set the wager
         for playernum in range(len(self.the_players)):
             # Draw a physical card
-            move.draw(len(card_stack))
-            the_card = getCard()
+            # move.draw(len(card_stack))
+            # the_card = getCard()
+            the_card = self.the_table.deck.deal()
             # Represent the physical card digitally
             self.the_players[playernum].hands[0].add_card(the_card)
             # Place the card at its physical location after flipping
-            move.place(the_card.coords)
+            # move.place(the_card.coords)
         # Draw a physical card
-        move.draw(len(card_stack))
-        the_card = getCard()
+        # move.draw(len(card_stack))
+        # the_card = getCard()
+        the_card = self.the_table.deck.deal()
         # Represent the physical card digitally
         self.the_dealer.hand.add_card(the_card)
         # Place the card at its physical location without flipping
-        move.place(the_card.coords, dealer=True)
+        # move.place(the_card.coords, dealer=True)
 
         # Deal second card to every player and the dealer
         for playernum in range(len(self.the_players)):
-            move.draw(len(card_stack))
-            the_card = getCard()
+            # move.draw(len(card_stack))
+            # the_card = getCard()
+            the_card = self.the_table.deck.deal()
             self.the_players[playernum].hands[0].add_card(the_card)
-            move.place(the_card.coords)
+            # move.place(the_card.coords)
             self.show_player(playernum, self.the_players[playernum].hands[0])
-        move.draw(len(card_stack))
-        the_card = getCard()
+        # move.draw(len(card_stack))
+        # the_card = getCard()
+        the_card = self.the_table.deck.deal()
         self.the_dealer.hand.add_card(the_card)
-        move.place(the_card.coords)
+        # move.place(the_card.coords)
         self.show_dealer_hidden(self.the_dealer.hand)
 
     def action(self, char, num):
@@ -125,11 +129,11 @@ class TestApp(App):
             if player.split_flag is True:
                 if player.hands[0].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
-                              player.hands[0], player, move=move)
+                              player.hands[0], player, move=None)
                     self.show_player(num-1, player.hands[0])
                 elif player.hands[1].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
-                              player.hands[1], player, move=move)
+                              player.hands[1], player, move=None)
                     self.show_player(num-1, player.hands[1])
                     if player.hands[1].done_flag is True:
                         player.action_btns_state(False)
@@ -150,7 +154,7 @@ class TestApp(App):
             else:
                 if player.hands[0].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
-                              player.hands[0], player, move=move)
+                              player.hands[0], player, move=None)
                     self.show_player(num-1, player.hands[0])
                     # Check if we move on following possible final action
                     if player.hands[0].done_flag is True:
@@ -210,7 +214,7 @@ class TestApp(App):
         while self.the_dealer.hand.score < 17 and self.the_dealer.hand.score != 21:
             # Use the hit function from game_functions
             gf.action('h', self.the_table.deck,
-                      self.the_dealer.hand, player=None, move=move)
+                      self.the_dealer.hand, player=None, move=None)
 
         self.show_dealer(self.the_dealer.hand)
         self.sm.ids.dealerhand.add_widget(self.the_dealer.hand)
@@ -234,7 +238,7 @@ class TestApp(App):
         for playernum in range(len(self.the_players)):
             self.the_players[playernum].clear()
         # Physically collect all cards
-        move.discard(card_stack)
+        # move.discard(card_stack)
         # Reset the card stack
         card_stack.clear()
         # Clear the Dealer's hand widget
