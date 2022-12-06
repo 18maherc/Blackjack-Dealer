@@ -228,7 +228,7 @@ class TestApp(App):
                 print(
                     f"Player {player.player_num} you now have {player.wallet} credits.")
                 self.sm.ids.playerresults.add_widget(PlayerResult(
-                    playernum=player.player_num, result=result))
+                    playernum=player.player_num, result=result, credits=player.wallet))
 
     def new_game(self):
         # -- End of game sequence --

@@ -99,60 +99,47 @@ def show_player(player_num: int, player_hand: Hand):
 
 # --- functions to handle end of game scenarios ---
 def player_busts(player: Player) -> str:
-    print("Player busts!")
     player.add_credits(0)
-    return 'lose'
+    return "Bust!"
 
 
 def player_wins(player: Player, hand: Hand) -> str:
     if hand.double_flag:
-        print("Player wins!")
         player.add_credits(4*player.wager)
-        return 'win'
     else:
-        print("Player wins!")
         player.add_credits(2*player.wager)
-        return 'win'
+    return "You win!"
 
 
 def player_blackjack(player: Player) -> str:
-    print("Player won with blackjack!")
     player.add_credits(2.5*player.wager)
-    return 'win'
+    return "Blackjack win!"
 
 
 def dealer_busts(player: Player, hand: Hand) -> str:
     if hand.double_flag:
-        print("Dealer busts!")
         player.add_credits(4*player.wager)
-        return 'win'
     else:
-        print("Dealer busts!")
         player.add_credits(2*player.wager)
-        return 'win'
+    return "Dealer busts!"
 
 
 def dealer_wins(player: Player) -> str:
-    print("Dealer wins!")
     player.add_credits(0)
-    return 'lose'
+    return "Dealer wins!"
 
 
 def push(player: Player, hand: Hand) -> str:
     if hand.double_flag:
-        print("Dealer and Player tie! It's a push.")
         player.add_credits(2*player.wager)
-        return 'push'
     else:
-        print("Dealer and Player tie! It's a push.")
         player.add_credits(player.wager)
-        return 'push'
+    return "Tie! A push."
 
 
 def surrendered(player: Player):
-    print("This hand was surrendered")
     player.add_credits(0.5*player.wager)
-    return 'surrendered'
+    return "Surrendered"
 
 
 def calculate_winner(dealer_hand: Hand, player_hand: Hand, player: Player) -> str:
@@ -195,4 +182,5 @@ def calculate_winner(dealer_hand: Hand, player_hand: Hand, player: Player) -> st
         else:
             result = player_busts(player)
 
+    print(result)
     return result
