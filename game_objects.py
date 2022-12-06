@@ -35,6 +35,8 @@ class Card():
 
 
 class Hand(BoxLayout):
+    score = NumericProperty()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.length = 0
@@ -45,7 +47,6 @@ class Hand(BoxLayout):
         self.double_flag = False
         self.base_coords = [250, 80]
         self.padding = [20, 0]
-        self.add_widget(Label(text=f"Score: {self.score}"))
 
     def add_card(self, card: Card):
         card.coords[0] = self.base_coords[0] - 25*(self.length)
@@ -234,6 +235,7 @@ class PlayerWager(BoxLayout):
 class PlayerResult(BoxLayout):
     playernum = NumericProperty()
     result = ObjectProperty()
+    credits = NumericProperty()
     pass
 
 
