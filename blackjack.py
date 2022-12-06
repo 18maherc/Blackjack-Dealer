@@ -1,207 +1,255 @@
 from game_objects import *
-from game_functions import *
+from mainDetector import getCard
+import game_functions as gf
 from communication import Move
+from kivy.app import App
+from kivy.lang import Builder
+from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
+from kivy.uix.label import Label
+from kivy.properties import ObjectProperty, NumericProperty
+from kivy.config import Config
+
 
 move = Move()
+Config.set('graphics', 'fullscreen', 1)
+Builder.load_file('controller.kv')
 
-# ---- Game: ----
-while True:
-    # Print an opening statement
-    print("Play a game of Blackjack!!")
 
-    # Get the number of players for the game
-    while True:
-        try:
-            num_of_players = int(input("How many players?? "))
-            break
-        except ValueError:
-            print("You must enter an integer")
-            continue
+# Declare all screens
+class ScreenManager(ScreenManager):
+    pass
 
-    # Initialize our table
-    the_table = Table(num_of_players)
 
-    # Play the game
-    while True:
-        the_dealer = the_table.dealer
-        the_players = the_table.players
-        dealer_hand = the_dealer.hand
+class SplashScreen(Screen):
+    # Intro screen with logo and start button
+    pass
 
-        # Take bets for all players
-        for playernum in range(len(the_players)):
-            player = the_players[playernum]
-            while True:
-                try:
-                    # Prompt to deposit if insufficient funds
-                    if player.wallet < 1:
-                        while True:
-                            try:
-                                deposit = int(
-                                    input(f"Player {playernum+1}, input a number of credits to deposit: "))
-                                player.add_credits(deposit)
-                                break
-                            except ValueError:
-                                print("You must enter an integer")
-                                continue
 
-                    # Prompt for wager
-                    bet_amount = int(input(
-                        f"Player {playernum+1}, you have {player.wallet} credits, enter your wager: "))
+class StartGameScreen(Screen):
+    # This screen should set number of players
+    pass
 
-                    # Handle wager input
-                    if bet_amount > 0:
-                        # Set wager and remove credits if sufficient funds
-                        if bet_amount <= player.wallet:
-                            player.hands[0].wager = bet_amount
-                            player.remove_credits(bet_amount)
-                        else:
-                            raise Exception(
-                                "Cannot bet more than your current wallet")
-                    else:
-                        raise Exception(
-                            "Must bet a minimum of 1 credits to play")
-                    break
 
-                except Exception as e:
-                    print(e)
-                    continue
+class WagerScreen(Screen):
+    # This screen should set the wagers for each player before initializing them
+    pass
 
+
+class EndGameScreen(Screen):
+    # This screen is to show Dealer output and winners/losers
+    # Should also allow to play again or reset the game
+    pass
+
+
+class TestApp(App):
+    # Bundling everything together
+    playernum = NumericProperty(defaultvalue=1)
+
+    def build(self):
+        # Print an opening statement
+        print("Play a game of Blackjack!!")
+        # Create the screen manager
+        self.sm = ScreenManager(transition=NoTransition())
+        # Initialize the table
+        self.the_table = None
+
+        return self.sm
+
+    def decrease_number(self):
+        if self.playernum > 1:
+            self.playernum -= 1
+
+    def increase_number(self):
+        if self.playernum < 3:
+            self.playernum += 1
+
+    def init_wagerscreen(self):
+        for i in range(self.playernum):
+            player_layout = PlayerWager(playernum=(i+1))
+            self.sm.ids.players.add_widget(player_layout)
+
+    def init_table(self):
+        if self.the_table is None:
+            self.the_table = Table(self.playernum, self.sm)
+
+            self.the_players = self.the_table.players
+            self.the_dealer = self.the_table.dealer
+
+        self.set_wagers()
+        self.initial_deal()
+
+    def set_wagers(self):
+        # Set wagers
+        for i in range(len(self.the_players)):
+            set_wager = self.sm.ids.players.children[(
+                len(self.the_players)-1)-i].wager
+            if set_wager > self.the_players[i].wallet:
+                set_wager = self.the_players[i].wallet
+            self.the_players[i].wager = set_wager
+            self.the_players[i].remove_credits(self.the_players[i].wager)
+
+    def initial_deal(self):
         # Deal first card to every player and the dealer. Also set the wager
-        for playernum in range(len(the_players)):
+        for playernum in range(len(self.the_players)):
             # Draw a physical card
             move.draw(len(card_stack))
-            # TODO: Read the physical card in
-            the_card = the_table.deck.deal()
+            the_card = getCard()
             # Represent the physical card digitally
-            the_players[playernum].hands[0].add_card(the_card)
+            self.the_players[playernum].hands[0].add_card(the_card)
             # Place the card at its physical location after flipping
             move.place(the_card.coords)
         # Draw a physical card
         move.draw(len(card_stack))
-        # TODO: Read the physical card in
-        the_card = the_table.deck.deal()
+        the_card = getCard()
         # Represent the physical card digitally
-        the_dealer.hand.add_card(the_card)
+        self.the_dealer.hand.add_card(the_card)
         # Place the card at its physical location without flipping
         move.place(the_card.coords, dealer=True)
 
         # Deal second card to every player and the dealer
-        for playernum in range(len(the_players)):
+        for playernum in range(len(self.the_players)):
             move.draw(len(card_stack))
-            the_card = the_table.deck.deal()
-            the_players[playernum].hands[0].add_card(the_card)
+            the_card = getCard()
+            self.the_players[playernum].hands[0].add_card(the_card)
             move.place(the_card.coords)
+            self.show_player(playernum, self.the_players[playernum].hands[0])
         move.draw(len(card_stack))
-        the_table.deck.deal()
-        the_dealer.hand.add_card(the_card)
+        the_card = getCard()
+        self.the_dealer.hand.add_card(the_card)
         move.place(the_card.coords)
+        self.show_dealer_hidden(self.the_dealer.hand)
 
-        # Show Dealer's initial hand with one card shown
-        show_dealer_hidden(dealer_hand)
+    def action(self, char, num):
+        player = self.the_players[num-1]
+        try:
+            if player.split_flag is True:
+                if player.hands[0].done_flag is not True:
+                    gf.action(char[0], self.the_table.deck,
+                              player.hands[0], player, move=move)
+                    self.show_player(num-1, player.hands[0])
+                    player.action_btns_state(True)
+                elif player.hands[1].done_flag is not True:
+                    gf.action(char[0], self.the_table.deck,
+                              player.hands[1], player, move=move)
+                    self.show_player(num-1, player.hands[1])
+                    if player.hands[1].done_flag is True:
+                        player.action_btns_state(False)
+                        player.done_flag = True
+                    else:
+                        player.action_btns_state(True)
+                        player.done_flag = False
+                else:
+                    print("Player has no hands to do action on")
+                    # Check if we move on following possible final action
+                    if player.hands[1].done_flag is True:
+                        player.action_btns_state(False)
+                        player.done_flag = True
+                    else:
+                        player.action_btns_state(True)
+                        player.done_flag = False
 
-        # Ask for each player's actions in the game
-        for playernum in range(len(the_players)):
-            player = the_players[playernum]
-            # Check if dealer is showing Ace
-            if dealer_hand.cards[0].value == 'Ace':
-                # Ask players if they want to place insurance bet
-                while True:
-                    try:
-                        ins_choice = input(
-                            "Would you like to place an insurance wager? (y/n) ")
-                        if ins_choice[0].lower() == 'y':
-                            insurance(player)
-                        break
-                    except ValueError:
-                        print("You must enter y/n")
-                    except Exception as e:
-                        print(e)
-                        break
-            hand = player.hands[0]
-            # Continuously ask Player for action until they are finished
-            while hand.done_flag is not True and player.split_flag is not True:
-                # Show current hand
-                show_player(playernum, hand)
-                # Prompt for Player to Hit or Stand
-                action(the_table.deck, hand, player, move)
-            # Show the final state of the hand
-            show_player(playernum, hand)
+            else:
+                if player.hands[0].done_flag is not True:
+                    gf.action(char[0], self.the_table.deck,
+                              player.hands[0], player, move=move)
+                    self.show_player(num-1, player.hands[0])
+                    # Check if we move on following possible final action
+                    if player.hands[0].done_flag is True:
+                        player.action_btns_state(False)
+                        player.done_flag = True
+                    else:
+                        player.action_btns_state(True)
+                        player.done_flag = False
 
-            # Check if the Player split their initial hand
-            if player.split_flag:
-                # Player split their hand so let's do that process again
-                for handnum in range(len(player.hands)):
-                    hand = player.hands[handnum]
-                    hand_split = False
-                    while hand.done_flag is not True and hand_split is not True:
-                        # Show current hand
-                        show_player(playernum, hand)
-                        # Prompt for Player to Hit or Stand
-                        # TODO: pass in 'move'
-                        action(the_table.deck, hand, player, move)
-                    # Show the final state of the hand
-                    show_player(playernum, hand)
+                else:
+                    print("Player has no hands to do action on")
+                    # Check if we move on following possible final action
+                    if player.hands[0].done_flag is True:
+                        player.action_btns_state(False)
+                        player.done_flag = True
+                    else:
+                        player.action_btns_state(True)
+                        player.done_flag = False
 
-        # Get rid of surrendered hands and refund partial wagers
-        # TODO: figure out if we want to just do this at the end (and have a surrender flag check for winnings)
-        surrender_coords = []
-        for playernum in range(len(the_players)):
-            player = the_players[playernum]
-            for hand in player.hands:
-                if hand.surrender_flag == True:
-                    for card in hand:
-                        surrender_coords.append(card.coords)
-                    player.delete_hand(hand)
-                    player.add_credits(0.5*hand.wager)
-        move.discard(surrender_coords)
+        except Exception as e:
+            print(e)
 
-        # Have Dealer play out its hand until reaching soft or hard 17
-        while dealer_hand.score < 17 and dealer_hand.score != 21:
+    def insurance(self, player):
+        gf.insurance(player)
+
+    def show_dealer(self, hand):
+        gf.show_dealer(hand)
+
+    def show_dealer_hidden(self, hand):
+        gf.show_dealer_hidden(hand)
+
+    def show_player(self, player_num, player_hand):
+        gf.show_player(player_num, player_hand)
+
+    def next_player(self):
+        current = self.sm.current
+        if current[:6] == 'player':
+            num = int(current[6])
+            if num == len(self.the_players):
+                for i in range(len(self.the_players)):
+                    if self.the_players[i].done_flag is not True:
+                        return
+                self.calculate_winners()
+                self.sm.current = 'endgamescreen'
+            else:
+                self.sm.current = f'player{num+1}'
+
+    def prev_player(self):
+        current = self.sm.current
+        if current[:6] == 'player':
+            num = int(current[6])
+            if num > 1:
+                self.sm.current = f'player{num-1}'
+
+    def calculate_winners(self):
+        # Complete the Dealer's hand
+        while self.the_dealer.hand.score < 17 and self.the_dealer.hand.score != 21:
             # Use the hit function from game_functions
-            hit(the_table.deck, dealer_hand, move)
-            # TODO: add motor functionality here --------------------------
+            gf.action('h', self.the_table.deck,
+                      self.the_dealer.hand, player=None, move=move)
 
-        # Show Dealer's cards
-        show_dealer(dealer_hand)
+        self.show_dealer(self.the_dealer.hand)
+        self.sm.ids.dealerhand.add_widget(self.the_dealer.hand)
 
-        # Handle insurance bets
-        if dealer_hand.score == 21 and dealer_hand.size == 2:
-            for player in the_players:
-                if player.insurance_flag is True:
-                    player.add_credits(3*0.5*player.hands[0].wager)
-
-        # Calculate any winning hands as necessary and show final balance
-        for playernum in range(len(the_players)):
-            player = the_players[playernum]
+        # Calculate the winner from all hands for all players
+        for player in self.the_players:
             for handnum in range(len(player.hands)):
-                calculate_winner(dealer_hand, player.hands[handnum], player)
+                result = gf.calculate_winner(self.the_dealer.hand,
+                                             player.hands[handnum], player)
                 print(
-                    f"Player {playernum+1} you now have {player.wallet} credits.")
+                    f"Player {player.player_num} you now have {player.wallet} credits.")
+                self.sm.ids.playerresults.add_widget(PlayerResult(
+                    playernum=player.player_num, result=result, credits=player.wallet))
 
+    def new_game(self):
         # -- End of game sequence --
         # Replace the dealer's hand
-        the_dealer.hand = Hand()
-        dealer_hand = the_dealer.hand
+        self.the_dealer.hand = DealerHand()
+        self.dealer_hand = self.the_dealer.hand
         # Reset the players
-        for playernum in range(len(the_players)):
-            the_players[playernum].clear()
+        for playernum in range(len(self.the_players)):
+            self.the_players[playernum].clear()
         # Physically collect all cards
         move.discard(card_stack)
-        card_stack = []
+        # Reset the card stack
+        card_stack.clear()
+        # Clear the Dealer's hand widget
+        self.sm.ids.dealerhand.clear_widgets(self.sm.ids.dealerhand.children)
+        # Add the default label back into the Dealer's hand widget
+        self.sm.ids.dealerhand.add_widget(
+            Label(text='Dealer Hand:', size_hint_x=0.2))
+        # Clear the Player results widget(s)
+        self.sm.ids.playerresults.clear_widgets(
+            self.sm.ids.playerresults.children)
+        # Reenable some disabled buttons
+        self.sm.ids.go_button.disabled = False
+        self.sm.ids.new_game_button.disabled = False
 
-        # Ask to play again
-        new_game = input(
-            "Would you like to play another game? Enter 'y' or 'n' ")
 
-        if new_game[0].lower() == 'y':
-            continue
-        else:
-            print("Thanks for playing!")
-            break
-
-    # TODO: Handle removal/addition of players frorm the table
-    # (Will require adjusting base coords)
-
-    close_game = input("Would you like to close the game? (y/n) ")
-    if close_game[0].lower() == 'y':
-        break
+if __name__ == '__main__':
+    TestApp().run()

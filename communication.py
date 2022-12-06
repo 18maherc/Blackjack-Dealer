@@ -37,11 +37,11 @@ class Move():
     def deal(self, coord2, dealer=False, frate=10000):
         f = []
         if dealer:
-            coord1=[0, 0]
+            coord1 = [0, 0]
         else:
-            coord1=[0, -85]
+            coord1 = [0, -85]
             f = ["G0Z-16", "G4P2", "G0Z-1"]
-            
+
         coord2[1] = -coord2[1]
         d = [f"G01X{coord1[0]}Y{coord1[1]}Z-1F{frate}", "M03",
              f"G1X{coord1[0]}Y{coord1[1]}Z-6.0F200", "G04P1", f"G0X{coord1[0]}Y{coord1[1]}Z-1",
@@ -57,7 +57,7 @@ class Move():
             grbl_out = self.s.readline()  # Wait for grbl response with carriage return
             print(' : ' + bytes.decode(grbl_out.strip()))
         print('Stream Complete')
-        
+
     # s is the serial variable
     # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
     # dealer is only invoked on the deal -> no flipping
