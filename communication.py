@@ -34,7 +34,7 @@ class Move():
     # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
-    def deal(self, coord2, dealer=False, frate=10000):
+    def place(self, coord2, dealer=False, frate=10000):
         f = []
         if dealer:
             coord1 = [0, 0]
@@ -62,7 +62,7 @@ class Move():
     # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
-    def place(self, coord2, coord1, frate=10000):
+    def split(self, coord2, coord1=[0, 0], frate=10000):
         coord1[1] = -coord1[1]
         coord2[1] = -coord2[1]
         f = [f"G01X{coord1[0]}Y{coord1[1]}Z-1F{frate}", "M03",
