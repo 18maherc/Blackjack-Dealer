@@ -34,41 +34,14 @@ class Move():
     # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
-    def place(self, coord2, dealer=False, frate=10000):
-        f = []
-        if dealer:
-            coord1 = [0, 0]
-        else:
-            coord1 = [0, -85]
-            f = ["G0Z-16", "G4P2", "G0Z-1"]
 
-        coord2[1] = -coord2[1]
-        d = [f"G01X{coord1[0]}Y{coord1[1]}Z-1F{frate}", "M03",
+    def place(self, coord2, coord1=[0, 0], frate=10000):
+        coord1[1] = coord1[1]
+        coord2[1] = coord2[1]
+        f = [f"G01X{coord1[0]}Y{coord1[1]}Z-1F{frate}", "S1000M03",
              f"G1X{coord1[0]}Y{coord1[1]}Z-6.0F200", "G04P1", f"G0X{coord1[0]}Y{coord1[1]}Z-1",
              f"G01X{coord2[0]}Y{coord2[1]}Z-1F{frate}", f"G0X{coord2[0]}Y{coord2[1]}Z-4.5",
-             "M05", "G04P1", "M3", f"G0X{coord2[0]}Y{coord2[1]}Z-1", "M5", f"G1X125Y0Z-1F{frate}"]
-        f.extend(d)
-
-        # Stream g-code to grbl
-        for line in f:
-            l = line.strip()  # Strip all EOL characters for consistency
-            print('Sending: ' + l)
-            self.s.write(str.encode(l + '\n'))  # Send g-code block to grbl
-            grbl_out = self.s.readline()  # Wait for grbl response with carriage return
-            print(' : ' + bytes.decode(grbl_out.strip()))
-        print('Stream Complete')
-
-    # s is the serial variable
-    # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
-    # dealer is only invoked on the deal -> no flipping
-    # frate = feedrate, speed at which the move is executed
-    def split(self, coord2, coord1=[0, 0], frate=10000):
-        coord1[1] = -coord1[1]
-        coord2[1] = -coord2[1]
-        f = [f"G01X{coord1[0]}Y{coord1[1]}Z-1F{frate}", "M03",
-             f"G1X{coord1[0]}Y{coord1[1]}Z-6.0F200", "G04P1", f"G0X{coord1[0]}Y{coord1[1]}Z-1",
-             f"G01X{coord2[0]}Y{coord2[1]}Z-1F{frate}", f"G0X{coord2[0]}Y{coord2[1]}Z-4.5",
-             "M05", "G04P1", "M3", f"G0X{coord2[0]}Y{coord2[1]}Z-1", "M5", f"G1X125Y0Z-1F{frate}"]
+             "M05", "G04P1", f"G0X{coord2[0]}Y{coord2[1]}Z-1", f"G1X125Y0Z-1F{frate}"]
         # Stream g-code to grbl
         for line in f:
             l = line.strip()  # Strip all EOL characters for consistency

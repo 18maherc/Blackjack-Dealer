@@ -104,7 +104,7 @@ class TestApp(App):
         # Represent the physical card digitally
         self.the_dealer.hand.add_card(the_card)
         # Place the card at its physical location without flipping
-        move.place(the_card.coords, dealer=True)
+        move.place(the_card.coords)
 
         # Deal second card to every player and the dealer
         for playernum in range(len(self.the_players)):
