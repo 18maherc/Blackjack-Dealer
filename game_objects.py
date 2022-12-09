@@ -35,6 +35,8 @@ class Card():
 
 
 class Hand(BoxLayout):
+    score = NumericProperty()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.length = 0
@@ -233,6 +235,7 @@ class PlayerWager(BoxLayout):
 class PlayerResult(BoxLayout):
     playernum = NumericProperty()
     result = ObjectProperty()
+    credits = NumericProperty()
     pass
 
 

@@ -64,9 +64,12 @@ class TestApp(App):
             self.playernum += 1
 
     def init_wagerscreen(self):
+        wagerlayouts = []
         for i in range(self.playernum):
-            player_layout = PlayerWager(playernum=(i+1))
-            self.sm.ids.players.add_widget(player_layout)
+            wagerlayouts.append(PlayerWager(playernum=(i+1)))
+
+        for layout in reversed(wagerlayouts):
+            self.sm.ids.players.add_widget(layout)
 
     def init_table(self):
         if self.the_table is None:
@@ -127,6 +130,7 @@ class TestApp(App):
                     gf.action(char[0], self.the_table.deck,
                               player.hands[0], player, move=move)
                     self.show_player(num-1, player.hands[0])
+                    player.action_btns_state(True)
                 elif player.hands[1].done_flag is not True:
                     gf.action(char[0], self.the_table.deck,
                               player.hands[1], player, move=move)
@@ -216,14 +220,20 @@ class TestApp(App):
         self.sm.ids.dealerhand.add_widget(self.the_dealer.hand)
 
         # Calculate the winner from all hands for all players
+        playerresults = []
         for player in self.the_players:
             for handnum in range(len(player.hands)):
                 result = gf.calculate_winner(self.the_dealer.hand,
                                              player.hands[handnum], player)
                 print(
                     f"Player {player.player_num} you now have {player.wallet} credits.")
-                self.sm.ids.playerresults.add_widget(PlayerResult(
-                    playernum=player.player_num, result=result))
+                # self.sm.ids.playerresults.add_widget(PlayerResult(
+                #    playernum=player.player_num, result=result, credits=player.wallet), index=-len(self.sm.ids.playerresults.children))
+                playerresults.append(PlayerResult(
+                    playernum=player.player_num, result=result, credits=player.wallet))
+        # let's do this displaying in the most inefficient way possible just to not risk breaking something
+        for result in reversed(playerresults):
+            self.sm.ids.playerresults.add_widget(result)
 
     def new_game(self):
         # -- End of game sequence --
