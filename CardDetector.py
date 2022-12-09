@@ -41,7 +41,7 @@ class Detector:
             testFilter.append(c)
 
         for c in contours2:
-            if (cv2.contourArea(c) > 1350 and cv2.contourArea(c) < 1450 and cv2.arcLength(c, True) > 145 and cv2.arcLength(c, True) < 185) or (cv2.contourArea(c) > 1725 and cv2.contourArea(c) < 1835 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 205) or (cv2.contourArea(c) > 1615 and cv2.contourArea(c) < 1710 and cv2.arcLength(c, True) > 215 and cv2.arcLength(c, True) < 255) or (cv2.contourArea(c) > 1750 and cv2.contourArea(c) < 1860 and cv2.arcLength(c, True) > 250 and cv2.arcLength(c, True) < 290):
+            if (cv2.contourArea(c) > 1350 and cv2.contourArea(c) < 1450 and cv2.arcLength(c, True) > 145 and cv2.arcLength(c, True) < 185) or (cv2.contourArea(c) > 1725 and cv2.contourArea(c) < 1835 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 205) or (cv2.contourArea(c) > 1505 and cv2.contourArea(c) < 1750 and cv2.arcLength(c, True) > 215 and cv2.arcLength(c, True) < 255) or (cv2.contourArea(c) > 1750 and cv2.contourArea(c) < 1860 and cv2.arcLength(c, True) > 250 and cv2.arcLength(c, True) < 290):
                 area = cv2.contourArea(c)
                 p = cv2.arcLength(c, True)
                 print(area, p)
@@ -168,7 +168,7 @@ class Detector:
         arrayAceOfSpades = []
 
         for c in contours:
-            if (cv2.contourArea(c) > 2100 and cv2.contourArea(c) < 2475 and cv2.arcLength(c, True) > 253 and cv2.arcLength(c, True) < 270) or (cv2.contourArea(c) > 2250 and cv2.contourArea(c) < 2575 and cv2.arcLength(c, True) > 200 and cv2.arcLength(c, True) < 230) or (cv2.contourArea(c) > 1610 and cv2.contourArea(c) < 1800 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 195) or (cv2.contourArea(c) > 2325 and cv2.contourArea(c) < 2625 and cv2.arcLength(c, True) > 290 and cv2.arcLength(c, True) < 320):
+            if (cv2.contourArea(c) > 2100 and cv2.contourArea(c) < 2475 and cv2.arcLength(c, True) > 253 and cv2.arcLength(c, True) < 280) or (cv2.contourArea(c) > 2250 and cv2.contourArea(c) < 2575 and cv2.arcLength(c, True) > 200 and cv2.arcLength(c, True) < 230) or (cv2.contourArea(c) > 1610 and cv2.contourArea(c) < 1800 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 195) or (cv2.contourArea(c) > 2325 and cv2.contourArea(c) < 2625 and cv2.arcLength(c, True) > 290 and cv2.arcLength(c, True) < 320):
                 area = cv2.contourArea(c)
                 p = cv2.arcLength(c, True)
                 print(area, p)
