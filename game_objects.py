@@ -1,5 +1,6 @@
 import math
 import random
+import copy
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.button import Button
@@ -159,22 +160,19 @@ class Player(Screen):
                     # Add the money back
                     self.add_credits(self.wager)
 
-                    # Create a new hand
-                    new_hand1 = Hand()
-                    # Add one of the cards to it
-                    new_hand1.add_card(first_card)
-                    # Add the hand to the player
-                    self.add_hand(new_hand1)
+                    # Add a new hand to the player
+                    self.add_hand(Hand())
+                    # Add the first card to the first hand
+                    self.hands[0].add_card(first_card)
                     # Take money for hand's wager
                     self.remove_credits(self.wager)
 
                     # Save the coordinates of the second card
-                    second_prev_coords = second_card.coords
+                    second_prev_coords = copy.copy(second_card.coords)
 
                     # Repeat for the other card
-                    new_hand2 = Hand()
-                    new_hand2.add_card(second_card)
-                    self.add_hand(new_hand2)
+                    self.add_hand(Hand())
+                    self.hands[1].add_card(second_card)
                     self.remove_credits(self.wager)
 
                     # Use move to split the two cards
