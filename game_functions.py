@@ -10,14 +10,19 @@ move = Move()
 def action(x: str, deck: Deck, hand: Hand, player: Player, move: Move):
     try:
         if x[0].lower() == 'h':
+            print('Hit was pressed')
             hit(deck, hand, move)
         elif x[0].lower() == 's':
+            print('Stand was pressed')
             stand(hand)
         elif x[0].lower() == 'p' and player is not None:
+            print('Split was pressed')
             split(deck, player, move)
         elif x[0].lower() == 'd':
+            print('Double was pressed')
             double(deck, hand, player, move)
         elif x[0].lower() == 'l':
+            print('Surrender was pressed')
             surrender(hand)
         else:
             raise Exception("Invalid action. Please try again")
