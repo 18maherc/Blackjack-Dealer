@@ -34,23 +34,14 @@ class Move():
     # coord is the location the card needs to be placed; a list consisting of 2 values [x,y]
     # dealer is only invoked on the deal -> no flipping
     # frate = feedrate, speed at which the move is executed
-    def place(self, coord2, coord1=[0, 0], dealer=False, frate=10000):
-        coord1[1] = coord1[1]
-        coord2[1] = -coord2[1]
-        f = [f"G01X{coord1[0]}Y{coord1[1]}Z-1F{frate}", "M03",
-             f"G1X{coord1[0]}Y{coord1[1]}Z-6.0F200", "G04P1", f"G0X{coord1[0]}Y{coord1[1]}Z-1"]
-#         if dealer:
-#             f = ["G1X0Y0Z0F5000", "M03",
-#                  "G1X0Y0Z-6.7F200", "G04P2", "G1X0Y0Z0F200"]
-#         else:
-#             f = ["G1X0Y0Z0F5000", "M03",
-#                  "G1X0Y0Z-6.7F200", "G04P2", "G1X0Y0Z0F200"]
-# #             f = ["flip", "unflip", "flipped", "M03",
-# #                  "flipped + z", "G04P2", "flipped"]
-        d = [f"G01X{coord2[0]}Y{coord2[1]}Z-1F{frate}", f"G0X{coord2[0]}Y{coord2[1]}Z-4.5",
-             "M05", "G04P2", f"G0X{coord2[0]}Y{coord2[1]}Z-1", f"G1X125Y0Z-1F{frate}"]
-        f.extend(d)
 
+    def place(self, coord2, coord1=[0, 0], frate=10000):
+        coord1[1] = coord1[1]
+        coord2[1] = coord2[1]
+        f = [f"G01X{coord1[0]}Y{coord1[1]}Z-1F{frate}", "S1000M03",
+             f"G1X{coord1[0]}Y{coord1[1]}Z-6.0F200", "G04P1", f"G0X{coord1[0]}Y{coord1[1]}Z-1",
+             f"G01X{coord2[0]}Y{coord2[1]}Z-1F{frate}", f"G0X{coord2[0]}Y{coord2[1]}Z-4.5",
+             "M05", "G04P1", f"G0X{coord2[0]}Y{coord2[1]}Z-1", f"G1X125Y0Z-1F{frate}"]
         # Stream g-code to grbl
         for line in f:
             l = line.strip()  # Strip all EOL characters for consistency
