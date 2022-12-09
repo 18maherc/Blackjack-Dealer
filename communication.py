@@ -19,8 +19,8 @@ class Move():
     def draw(self, c, frate=10000):
         zoff = -4.7 - (1.3*c/52)
         zoff = round(zoff, 1)
-        f = ["$1=255", f"G1X125Y0Z0F{frate}", "G04P0", "S1000M03", "G04P0", f"G1X125Y0Z{zoff}F200", "G04P0", "G04P1", "G04P0",
-             "G1X125Y0Z0F200", "G04P0", f"G1X0Y0Z0F{frate}", "G04P0", "G0X0Y0Z-4.5", "G04P0", "M05", "G04P0", "G04P2", "G04P0", "G0X0Y0Z0", "G04P0"]
+        f = [f"G1X125Y0Z-1F{frate}", "G04P0", "S1000M03", "G04P0", f"G1X125Y0Z{zoff}F200", "G04P0", "G04P1", "G04P0",
+             "G1X125Y0Z-1F200", "G04P0", f"G1X0Y0Z-1F{frate}", "G04P0", "G0X0Y0Z-4.5", "G04P0", "M05", "$1=0", "G04P0", "G04P2", "G04P0", "G0X0Y0Z-1", "G04P0"]
         # Stream g-code to grbl
         for line in f:
             l = line.strip()  # Strip all EOL characters for consistency
