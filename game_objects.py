@@ -28,7 +28,7 @@ class Card():
         self.suit = suit
         self.value = value
         self.points = points[value]
-        self.coords = [250, 80]
+        self.coords = [240, 80]
         self.filename = f"{self.value}_{self.suit}.png"
 
     def to_string(self) -> str:
@@ -46,7 +46,7 @@ class Hand(BoxLayout):
         self.done_flag = False
         self.surrender_flag = False
         self.double_flag = False
-        self.base_coords = [250, 80]
+        self.base_coords = [240, 80]
         self.padding = [20, 0]
 
     def add_card(self, card: Card):
@@ -128,7 +128,7 @@ class Player(Screen):
         self.done_flag = False
         self.name = name
         self.player_num = player_num
-        self.base_coords = [250, 80+110*(self.player_num-1)]
+        self.base_coords = [240, 80+110*(self.player_num-1)]
         self.hands = []
         self.add_hand(Hand())
 

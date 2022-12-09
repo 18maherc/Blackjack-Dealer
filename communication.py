@@ -15,6 +15,7 @@ class Move():
         self.s.write(str.encode('\r\n\r\n'))
         time.sleep(2)   # Wait for grbl to initialize
         self.s.flushInput()  # Flush startup text in serial input
+        self.setG()
 
     def draw(self, c, frate=10000):
         zoff = -4.7 - (1.3*c/52)
