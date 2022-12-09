@@ -68,7 +68,7 @@ class Detector:
             testFilterValue.append(c)
 
         for c in contours2:
-            if (cv2.contourArea(c) > 180 and cv2.contourArea(c) < 320 and cv2.arcLength(c, True) > 120 and cv2.arcLength(c, True) < 150) or (cv2.contourArea(c) > 375 and cv2.contourArea(c) < 475 and cv2.arcLength(c, True) > 188 and cv2.arcLength(c, True) < 215) or (cv2.contourArea(c) > 560 and cv2.contourArea(c) < 650 and cv2.arcLength(c, True) > 95 and cv2.arcLength(c, True) < 130):
+            if (cv2.contourArea(c) > 180 and cv2.contourArea(c) < 320 and cv2.arcLength(c, True) > 120 and cv2.arcLength(c, True) < 150) or (cv2.contourArea(c) > 180 and cv2.contourArea(c) < 400 and cv2.arcLength(c, True) > 185 and cv2.arcLength(c, True) < 215) or (cv2.contourArea(c) > 500 and cv2.contourArea(c) < 700 and cv2.arcLength(c, True) > 95 and cv2.arcLength(c, True) < 130):
                 area = cv2.contourArea(c)
                 p = cv2.arcLength(c, True)
                 print(area, p)
@@ -168,7 +168,7 @@ class Detector:
         arrayAceOfSpades = []
 
         for c in contours:
-            if (cv2.contourArea(c) > 2100 and cv2.contourArea(c) < 2475 and cv2.arcLength(c, True) > 253 and cv2.arcLength(c, True) < 280) or (cv2.contourArea(c) > 2250 and cv2.contourArea(c) < 2575 and cv2.arcLength(c, True) > 200 and cv2.arcLength(c, True) < 230) or (cv2.contourArea(c) > 1610 and cv2.contourArea(c) < 1800 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 195) or (cv2.contourArea(c) > 2325 and cv2.contourArea(c) < 2625 and cv2.arcLength(c, True) > 290 and cv2.arcLength(c, True) < 320):
+            if (cv2.contourArea(c) > 2100 and cv2.contourArea(c) < 2475 and cv2.arcLength(c, True) > 253 and cv2.arcLength(c, True) < 270) or (cv2.contourArea(c) > 2250 and cv2.contourArea(c) < 2575 and cv2.arcLength(c, True) > 200 and cv2.arcLength(c, True) < 230) or (cv2.contourArea(c) > 1610 and cv2.contourArea(c) < 1800 and cv2.arcLength(c, True) > 170 and cv2.arcLength(c, True) < 195) or (cv2.contourArea(c) > 2325 and cv2.contourArea(c) < 2625 and cv2.arcLength(c, True) > 290 and cv2.arcLength(c, True) < 320):
                 area = cv2.contourArea(c)
                 p = cv2.arcLength(c, True)
                 print(area, p)
@@ -212,7 +212,7 @@ class Detector:
             medianContourArea = statistics.median(filteredAreas)
 
             for q in initFiltered:
-                if abs(cv2.arcLength(q, True)-medianContourPerimeter) < 60:
+                if abs(cv2.arcLength(q, True)-medianContourPerimeter) < 20:
                     print("here")
                     secondFiltered.append(q)
 
